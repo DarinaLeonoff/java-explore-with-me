@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+stats:
+  client:
+    url: http://localhost:9090
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+      platform: postgresql
+    #      data-locations: classpath:schema.sql
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6544/ewm_db
+    username: main_user
+    password: 12345
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: INFO
+          jpa.JpaTransactionManager: DEBUG
+        transaction: INFO
+        boot:
+          context:
+            config: DEBUG
+
