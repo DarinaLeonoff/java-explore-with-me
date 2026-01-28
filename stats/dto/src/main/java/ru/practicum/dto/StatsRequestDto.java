@@ -21,7 +21,7 @@ public class StatsRequestDto {
     private String app, uri;
 
     @NotNull
-    @Pattern(regexp = "^(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}$\n",
+    @Pattern(regexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$",
             message = "Принимаются только корректные адреса от 0.0.0.0 до 255.255.255.255")
     private String ip;
 
