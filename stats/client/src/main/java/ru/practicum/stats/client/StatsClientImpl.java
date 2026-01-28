@@ -1,8 +1,6 @@
 package ru.practicum.stats.client;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,7 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class StatsClientImpl implements StatsClient {
 
-    private static final Log log = LogFactory.getLog(StatsClientImpl.class);
     private final RestTemplate restTemplate;
     private final String statsServiceUrl;
 
@@ -26,6 +23,7 @@ public class StatsClientImpl implements StatsClient {
                 .ip(ip)
                 .timestamp(LocalDateTime.now())
                 .build();
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
