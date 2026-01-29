@@ -1,5 +1,6 @@
 package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -27,5 +28,5 @@ public class StatsRequestDto {
 
     @NotNull
     @PastOrPresent
-    private LocalDateTime timestamp;
+    private LocalDateTime created;
 }

@@ -21,7 +21,7 @@ public class StatsClientImpl implements StatsClient {
                 .app(app)
                 .uri(uri)
                 .ip(ip)
-                .timestamp(LocalDateTime.now())
+                .created(LocalDateTime.now())
                 .build();
 
         HttpHeaders headers = new HttpHeaders();

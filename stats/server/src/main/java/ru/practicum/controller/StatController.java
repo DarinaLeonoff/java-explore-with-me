@@ -13,7 +13,6 @@ public class StatController {
     @PostMapping("/hit")
     public void hitNewStat(@Valid @RequestBody StatsRequestDto dto) {
         System.out.println("HIT!");
-        System.out.println(dto.toString());
     }
 
     @GetMapping("/stats")
