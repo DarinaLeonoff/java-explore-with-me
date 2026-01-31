@@ -20,13 +20,11 @@ public class StatController {
 
     @PostMapping("/hit")
     public void hitNewStat(@Valid @RequestBody StatsRequestDto dto) {
-        System.out.println("HIT!");
         service.hit(dto);
     }
 
     @GetMapping("/stats")
     public StatsResponseDto getStats() {
-        System.out.println("Get stat");
         return service.getStats();
     }
 }
