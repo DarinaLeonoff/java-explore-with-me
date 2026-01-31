@@ -49,7 +49,7 @@ public class StatsClientTest {
         ArgumentCaptor<HttpEntity<StatsRequestDto>> captor = ArgumentCaptor.forClass(HttpEntity.class);
 
         // when
-        statsClient.hit(app, ip);
+        statsClient.hit(app, uri, ip);
 
         // then
         verify(restTemplate).postForEntity(eq(statsServiceUrl + uri), captor.capture(), eq(Void.class));

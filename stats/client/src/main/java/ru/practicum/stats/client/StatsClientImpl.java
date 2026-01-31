@@ -18,10 +18,10 @@ public class StatsClientImpl implements StatsClient {
     private final String statsServiceUrl;
 
     @Override
-    public void hit(String app, String ip) {
+    public void hit(String app, String uri, String ip) {
         StatsRequestDto dto = StatsRequestDto.builder()
                 .app(app)
-                .uri("/hit")
+                .uri(uri)
                 .ip(ip)
                 .created(LocalDateTime.now())
                 .build();

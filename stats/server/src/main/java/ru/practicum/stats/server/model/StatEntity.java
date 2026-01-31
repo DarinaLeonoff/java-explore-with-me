@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class StatEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "app")
     private String app;
