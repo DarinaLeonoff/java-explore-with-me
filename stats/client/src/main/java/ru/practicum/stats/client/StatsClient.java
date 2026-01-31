@@ -6,5 +6,6 @@ import java.util.Map;
 
 public interface StatsClient {
     void hit(String app, String ip);
+
     StatsResponseDto getStats(Map<String, String> params);
 }

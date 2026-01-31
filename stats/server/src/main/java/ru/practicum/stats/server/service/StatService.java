@@ -23,7 +23,7 @@ public class StatService {
         repository.save(mapper.mapStatsRequestDtoToStatEntity(dto));
     }
 
-    public StatsResponseDto getStats(){
+    public StatsResponseDto getStats() {
         List<StatEntity> entitys = repository.findAll();
         return mapper.mapEntityToResponseDto(entitys.getFirst(), entitys.size());
     }

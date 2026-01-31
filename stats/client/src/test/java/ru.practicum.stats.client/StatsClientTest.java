@@ -44,25 +44,15 @@ public class StatsClientTest {
         String uri = "/hit";
         String ip = "192.163.0.1";
 
-        StatsRequestDto dto = StatsRequestDto.builder()
-                .app(app)
-                .uri(uri)
-                .ip(ip)
-                .created(LocalDateTime.now())
-                .build();
+        StatsRequestDto dto = StatsRequestDto.builder().app(app).uri(uri).ip(ip).created(LocalDateTime.now()).build();
 
-        ArgumentCaptor<HttpEntity<StatsRequestDto>> captor =
-                ArgumentCaptor.forClass(HttpEntity.class);
+        ArgumentCaptor<HttpEntity<StatsRequestDto>> captor = ArgumentCaptor.forClass(HttpEntity.class);
 
         // when
         statsClient.hit(app, ip);
 
         // then
-        verify(restTemplate).postForEntity(
-                eq(statsServiceUrl+uri),
-                captor.capture(),
-                eq(Void.class)
-        );
+        verify(restTemplate).postForEntity(eq(statsServiceUrl + uri), captor.capture(), eq(Void.class));
 
         HttpEntity<StatsRequestDto> entity = captor.getValue();
         StatsRequestDto body = entity.getBody();
@@ -74,29 +64,17 @@ public class StatsClientTest {
         assertThat(body.getIp()).isEqualTo(ip);
         assertThat(body.getCreated()).isNotNull();
 
-        assertThat(headers.getContentType())
-                .isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(headers.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
 
     @Test
     void getStats_shouldCallGetForObjectAndReturnResponse() {
         // given
-        Map<String, String> params = Map.of(
-                "app", "ewm-main-server",
-                "uri", "/stats"
-        );
+        Map<String, String> params = Map.of("app", "ewm-main-server", "uri", "/stats");
 
-        StatsResponseDto responseDto = StatsResponseDto.builder()
-                .app("ewm-main-server")
-                .uri("/stats")
-                .hits(1)
-                .build();
+        StatsResponseDto responseDto = StatsResponseDto.builder().app("ewm-main-server").uri("/stats").hits(1).build();
 
-        when(restTemplate.getForObject(
-                eq(statsServiceUrl+"/stats"),
-                eq(StatsResponseDto.class),
-                eq(params)
-        )).thenReturn(responseDto);
+        when(restTemplate.getForObject(eq(statsServiceUrl + "/stats"), eq(StatsResponseDto.class), eq(params))).thenReturn(responseDto);
 
         // when
         StatsResponseDto result = statsClient.getStats(params);
@@ -104,10 +82,6 @@ public class StatsClientTest {
         // then
         assertThat(result).isEqualTo(responseDto);
 
-        verify(restTemplate).getForObject(
-                statsServiceUrl+"/stats",
-                StatsResponseDto.class,
-                params
-        );
+        verify(restTemplate).getForObject(statsServiceUrl + "/stats", StatsResponseDto.class, params);
     }
 }
