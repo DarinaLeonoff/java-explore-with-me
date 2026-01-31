@@ -9,6 +9,13 @@ import ru.practicum.stats.client.StatsClientImpl;
 @Configuration
 public class StatsClientAutoConfiguration {
     @Bean
+    public StatsClientProperties statsClientProperties() {
+        StatsClientProperties p = new StatsClientProperties();
+        p.setUrl("http://localhost"); // дефолт
+        return p;
+    }
+
+    @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
