@@ -1,4 +1,4 @@
-package ru.practicum.controller;
+package ru.practicum.stats.server.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
-import ru.practicum.service.StatService;
-
-import java.util.List;
+import ru.practicum.stats.server.service.StatService;
 
 @RestController
 public class StatController {

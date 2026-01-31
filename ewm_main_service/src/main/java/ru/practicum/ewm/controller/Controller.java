@@ -18,6 +18,6 @@ public class Controller {
     @PostMapping
     public void check() {
         log.info("Start hitting stats");
-        statsClient.hit("ewm-main-service", "/check", "192.163.0.1");
+        statsClient.hit("ewm-main-service", "192.163.0.1");
     }
 }

@@ -1,13 +1,13 @@
-package ru.practicum.service;
+package ru.practicum.stats.server.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
-import ru.practicum.mapper.StatMapper;
-import ru.practicum.model.StatEntity;
-import ru.practicum.repository.StatRepository;
+import ru.practicum.stats.server.mapper.StatMapper;
+import ru.practicum.stats.server.model.StatEntity;
+import ru.practicum.stats.server.repository.StatRepository;
 
 import java.util.List;
 
