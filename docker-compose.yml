@@ -1,5 +1,7 @@
 services:
   stats-server:
+    image: alpine:3.19
+    command: [ "sleep", "infinity" ]
     ports:
       - "9090:9090"
 
