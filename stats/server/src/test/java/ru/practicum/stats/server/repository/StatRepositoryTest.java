@@ -12,7 +12,8 @@ import ru.practicum.stats.server.model.StatEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 @SpringBootTest
@@ -25,12 +26,12 @@ public class StatRepositoryTest {
     private LocalDateTime now;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         now = LocalDateTime.now();
     }
 
     @Test
-    void saveTest(){
+    void saveTest() {
         StatEntity entity = generateEntity();
         StatEntity saved = repository.save(generateEntity());
 
@@ -42,7 +43,7 @@ public class StatRepositoryTest {
     }
 
     @Test
-    void getByDatesTest(){
+    void getByDatesTest() {
         StatEntity entity1 = generateEntity();
         StatEntity saved1 = repository.save(entity1);
 
@@ -54,10 +55,7 @@ public class StatRepositoryTest {
         entity2.setCreated(LocalDateTime.now().plusDays(2));
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByCreatedBetween(
-                LocalDateTime.now().minusDays(2),
-                LocalDateTime.now().plusDays(1)
-        );
+        List<StatEntity> entities = repository.findAllByCreatedBetween(LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1));
         StatEntity getEntity = entities.getFirst();
 
         assertEquals(2, entities.size());
@@ -70,7 +68,7 @@ public class StatRepositoryTest {
     }
 
     @Test
-    void getByDatesAndUrisTest(){
+    void getByDatesAndUrisTest() {
         StatEntity entity1 = generateEntity();
         StatEntity saved1 = repository.save(entity1);
 
@@ -82,10 +80,7 @@ public class StatRepositoryTest {
         entity3.setUri("/hit/2");
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByUriInAndCreatedBetween(
-                new String[]{"/hit"},
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(2));
+        List<StatEntity> entities = repository.findAllByUriInAndCreatedBetween(List.of("/hit"), LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2));
 
         StatEntity getEntity = entities.getFirst();
 
@@ -99,7 +94,7 @@ public class StatRepositoryTest {
     }
 
     @Test
-    void getUniqueByDatesTest(){
+    void getUniqueByDatesTest() {
         StatEntity entity1 = generateEntity();
         StatEntity saved1 = repository.save(entity1);
 
@@ -110,9 +105,7 @@ public class StatRepositoryTest {
         entity3.setIp("1.1.0.1");
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByCreatedBetweenAndIpIsUnique(
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(2));
+        List<StatEntity> entities = repository.findAllByCreatedBetweenAndIpIsUnique(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2));
 
         StatEntity getEntity = entities.getFirst();
 
@@ -125,13 +118,8 @@ public class StatRepositoryTest {
         assertEquals(saved1.getId(), getEntity.getId());
     }
 
-    private StatEntity generateEntity(){
-        return StatEntity.builder()
-                .app("ewm-main")
-                .uri("/hit")
-                .ip("1.1.1.1")
-                .created(now)
-                .build();
+    private StatEntity generateEntity() {
+        return StatEntity.builder().app("ewm-main").uri("/hit").ip("1.1.1.1").created(now).build();
     }
 
 }

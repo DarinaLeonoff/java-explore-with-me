@@ -25,6 +25,19 @@ public interface StatRepository extends JpaRepository<StatEntity, Long> {
             """)
     List<StatEntity> findAllByCreatedBetweenAndIpIsUnique(LocalDateTime start, LocalDateTime end);
 
-    List<StatEntity> findAllByUriInAndCreatedBetween(String[] uris, LocalDateTime start, LocalDateTime end);
+    List<StatEntity> findAllByUriInAndCreatedBetween(List<String> uris, LocalDateTime start, LocalDateTime end);
+
+    @Query("""
+                SELECT s
+                FROM StatEntity s
+                WHERE ((s.created BETWEEN :start AND :end) AND (s.uri IN :uris))
+                  AND s.id = (
+                      SELECT MIN(s2.id)
+                      FROM StatEntity s2
+                      WHERE s2.ip = s.ip
+                        AND s2.created BETWEEN :start AND :end
+                  )
+            """)
+    List<StatEntity> findAllByUrisBetweenAndIpIsUnique(List<String> uris, LocalDateTime start, LocalDateTime end);
 
 }

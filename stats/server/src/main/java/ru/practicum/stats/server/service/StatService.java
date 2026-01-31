@@ -9,7 +9,9 @@ import ru.practicum.stats.server.mapper.StatMapper;
 import ru.practicum.stats.server.model.StatEntity;
 import ru.practicum.stats.server.repository.StatRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,9 +25,19 @@ public class StatService {
         repository.save(mapper.mapStatsRequestDtoToStatEntity(dto));
     }
 
-    public StatsResponseDto getStats() {
-        List<StatEntity> entitys = repository.findAll();
-        return mapper.mapEntityToResponseDto(entitys.getFirst(), entitys.size());
+    public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        List<StatEntity> entities;
+        if ((uris != null && !uris.isEmpty()) && (unique != null && unique)) {
+            entities = repository.findAllByUrisBetweenAndIpIsUnique(uris, start, end);
+        } else if (uris != null && !uris.isEmpty()) {
+            entities = repository.findAllByUriInAndCreatedBetween(uris, start, end);
+        } else if (unique != null && unique) {
+            entities = repository.findAllByCreatedBetweenAndIpIsUnique(start, end);
+        } else {
+            entities = repository.findAllByCreatedBetween(start, end);
+        }
+
+        return entities.stream().collect(Collectors.groupingBy(StatEntity::getApp, Collectors.groupingBy(StatEntity::getUri, Collectors.counting()))).entrySet().stream().flatMap(appEntry -> appEntry.getValue().entrySet().stream().map(uriEntry -> new StatsResponseDto(appEntry.getKey(), uriEntry.getKey(), uriEntry.getValue().intValue()))).toList();
     }
 
 }

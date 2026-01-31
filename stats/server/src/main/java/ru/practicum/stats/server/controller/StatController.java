@@ -2,13 +2,16 @@ package ru.practicum.stats.server.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.stats.server.service.StatService;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class StatController {
@@ -17,12 +20,17 @@ public class StatController {
     private StatService service;
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public void hitNewStat(@Valid @RequestBody StatsRequestDto dto) {
         service.hit(dto);
     }
 
     @GetMapping("/stats")
-    public StatsResponseDto getStats() {
-        return service.getStats();
+    public List<StatsResponseDto> getStats(
+            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+            @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+            @RequestParam(required = false) List<String> uris,
+            @RequestParam(required = false) Boolean unique) {
+        return service.getStats(start, end, uris, unique);
     }
 }
