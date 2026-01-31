@@ -1,6 +1,7 @@
 package ru.practicum.stats.server.mapper;
 
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.stats.server.model.StatEntity;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StatMapperTest {
-    private StatMapper mapper = new StatMapperImpl();
+    private StatMapper mapper = Mappers.getMapper(StatMapper.class);
 
     private final LocalDateTime now = LocalDateTime.now();
     private final StatEntity entity = StatEntity.builder().app("ewm-main-server").uri("/stats").ip("192.163.0.1").created(now).build();
