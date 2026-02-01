@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stats")
+@Builder
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatEntity {

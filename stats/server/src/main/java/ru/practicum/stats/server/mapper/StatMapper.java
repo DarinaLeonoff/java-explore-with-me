@@ -9,7 +9,7 @@ import ru.practicum.stats.server.model.StatEntity;
 @Mapper(componentModel = "spring")
 public interface StatMapper {
 
-//    @Mapping(target = "app", source = "app")
+    @Mapping(target = "app", source = "dto.app")
     StatEntity mapStatsRequestDtoToStatEntity(StatsRequestDto dto);
 
     @Mapping(target = "hits", source = "hits")

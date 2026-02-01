@@ -33,7 +33,6 @@ public class StatServiceTest {
     @Mock
     private StatRepository repository;
 
-    private StatsRequestDto dto = new StatsRequestDto();
     private LocalDateTime start;
     private LocalDateTime end;
 
@@ -45,7 +44,22 @@ public class StatServiceTest {
 
     @Test
     void hitTest() {
-        when(mapper.mapStatsRequestDtoToStatEntity(dto)).thenReturn(new StatEntity());
+        StatsRequestDto dto = StatsRequestDto.builder()
+                .app("main")
+                .uri("/uri")
+                .ip("1.1.1.1")
+                .created(LocalDateTime.now())
+                .build();
+        StatEntity entity = StatEntity.builder()
+                .app("main")
+                .uri("/uri")
+                .ip("1.1.1.1")
+                .created(LocalDateTime.now())
+                .build();
+
+        when(mapper.mapStatsRequestDtoToStatEntity(dto)).thenReturn(entity);
+        when(repository.save(any(StatEntity.class)))
+                .thenReturn(entity);
 
         service.hit(dto);
 
@@ -54,7 +68,7 @@ public class StatServiceTest {
 
     //    uris != null && !empty && unique == true
     @Test
-    void getStats_withUris_andUniqueTrue() {
+    void getStatsWithUrisAndUniqueTrue() {
         List<String> uris = List.of("/hit");
         Boolean unique = true;
 
@@ -71,7 +85,7 @@ public class StatServiceTest {
 
     //    uris != null && !empty && unique == false/null
     @Test
-    void getStats_withUris_andUniqueFalse() {
+    void getStatsWithUrisAndUniqueFalse() {
         List<String> uris = List.of("/hit");
         Boolean unique = false;
 
@@ -88,7 +102,7 @@ public class StatServiceTest {
 
     //    uris == null/empty && unique == true
     @Test
-    void getStats_withoutUris_andUniqueTrue() {
+    void getStatsWithoutUrisAndUniqueTrue() {
         List<String> uris = null;
         Boolean unique = true;
 
@@ -104,7 +118,7 @@ public class StatServiceTest {
 
     //    uris == null/empty && unique == false/null
     @Test
-    void getStats_withoutUris_andUniqueFalse() {
+    void getStatsWithoutUrisAndUniqueFalse() {
         List<String> uris = null;
         Boolean unique = null;
 
