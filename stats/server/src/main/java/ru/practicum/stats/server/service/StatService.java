@@ -11,6 +11,7 @@ import ru.practicum.stats.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,22 +23,50 @@ public class StatService {
     private StatMapper mapper;
 
     public void hit(StatsRequestDto dto) {
-        repository.save(mapper.mapStatsRequestDtoToStatEntity(dto));
+        StatEntity saved = repository.save(mapper.mapStatsRequestDtoToStatEntity(dto));
+        log.info("Saved with id={}", saved.getId());
+        log.info("Saved with date={}", saved.getCreated());
     }
 
     public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         List<StatEntity> entities;
         if ((uris != null && !uris.isEmpty()) && (unique != null && unique)) {
-            entities = repository.findAllByUrisBetweenAndIpIsUnique(uris, start, end);
+            entities = repository.findAllUniqueIpByUrisBetween(uris, start, end);
+            log.info("Get unique visits with uris. Entities size is {}", entities.size());
         } else if (uris != null && !uris.isEmpty()) {
             entities = repository.findAllByUriInAndCreatedBetween(uris, start, end);
+            log.info("Get all visits with uris: {}\n. Entities size is {}", uris.toArray(), entities.size());
         } else if (unique != null && unique) {
             entities = repository.findAllByCreatedBetweenAndIpIsUnique(start, end);
+            log.info("Get unique visits. Entities size is {}", entities.size());
         } else {
             entities = repository.findAllByCreatedBetween(start, end);
+            log.info("Get all visits. Entities size is {}", entities.size());
         }
 
-        return entities.stream().collect(Collectors.groupingBy(StatEntity::getApp, Collectors.groupingBy(StatEntity::getUri, Collectors.counting()))).entrySet().stream().flatMap(appEntry -> appEntry.getValue().entrySet().stream().map(uriEntry -> new StatsResponseDto(appEntry.getKey(), uriEntry.getKey(), uriEntry.getValue().intValue()))).toList();
+        Map<String, Map<String, Long>> statsByAppAndUri =
+                entities.stream()
+                        .collect(Collectors.groupingBy(
+                                StatEntity::getApp,
+                                Collectors.groupingBy(
+                                        StatEntity::getUri,
+                                        Collectors.counting()
+                                )
+                        ));
+
+// 2. Преобразование Map в список DTO
+                return statsByAppAndUri.entrySet().stream()
+                        .flatMap(appEntry ->
+                                appEntry.getValue().entrySet().stream()
+                                        .map(uriEntry ->
+                                                new StatsResponseDto(
+                                                        appEntry.getKey(),
+                                                        uriEntry.getKey(),
+                                                        uriEntry.getValue().intValue()
+                                                )
+                                        )
+                        )
+                        .toList();
     }
 
 }

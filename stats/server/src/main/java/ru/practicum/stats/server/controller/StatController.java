@@ -1,6 +1,7 @@
 package ru.practicum.stats.server.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import ru.practicum.stats.server.service.StatService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class StatController {
 
@@ -25,7 +27,15 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public List<StatsResponseDto> getStats(@RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start, @RequestParam(required = true) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end, @RequestParam(required = false) List<String> uris, @RequestParam(required = false) Boolean unique) {
+    public List<StatsResponseDto> getStats(@RequestParam(required = true)
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                               LocalDateTime start,
+                                           @RequestParam(required = true)
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                               LocalDateTime end,
+                                           @RequestParam(required = false) List<String> uris,
+                                           @RequestParam(required = false) Boolean unique) {
+        log.info("Getting stat from {} to {}", start, end);
         return service.getStats(start, end, uris, unique);
     }
 }

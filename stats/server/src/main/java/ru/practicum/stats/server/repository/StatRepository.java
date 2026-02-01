@@ -29,15 +29,17 @@ public interface StatRepository extends JpaRepository<StatEntity, Long> {
 
     @Query("""
                 SELECT s
-                FROM StatEntity s
-                WHERE ((s.created BETWEEN :start AND :end) AND (s.uri IN :uris))
-                  AND s.id = (
-                      SELECT MIN(s2.id)
-                      FROM StatEntity s2
-                      WHERE s2.ip = s.ip
-                        AND s2.created BETWEEN :start AND :end
-                  )
+                    FROM StatEntity s
+                    WHERE s.created BETWEEN :start AND :end
+                      AND s.uri IN :uris
+                      AND s.created = (
+                          SELECT MIN(s2.created)
+                          FROM StatEntity s2
+                          WHERE s2.ip = s.ip
+                            AND s2.uri IN :uris
+                            AND s2.created BETWEEN :start AND :end
+                      )
             """)
-    List<StatEntity> findAllByUrisBetweenAndIpIsUnique(List<String> uris, LocalDateTime start, LocalDateTime end);
+    List<StatEntity> findAllUniqueIpByUrisBetween(List<String> uris, LocalDateTime start, LocalDateTime end);
 
 }

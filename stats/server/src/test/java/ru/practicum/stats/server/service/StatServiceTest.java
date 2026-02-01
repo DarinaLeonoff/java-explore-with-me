@@ -58,11 +58,11 @@ public class StatServiceTest {
         List<String> uris = List.of("/hit");
         Boolean unique = true;
 
-        when(repository.findAllByUrisBetweenAndIpIsUnique(uris, start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit")));
+        when(repository.findAllUniqueIpByUrisBetween(uris, start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit")));
 
         List<StatsResponseDto> result = service.getStats(start, end, uris, unique);
 
-        verify(repository).findAllByUrisBetweenAndIpIsUnique(uris, start, end);
+        verify(repository).findAllUniqueIpByUrisBetween(uris, start, end);
         verifyNoMoreInteractions(repository);
 
         assertThat(result).hasSize(1);

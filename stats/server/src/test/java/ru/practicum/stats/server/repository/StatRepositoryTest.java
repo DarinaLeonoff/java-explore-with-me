@@ -52,10 +52,10 @@ public class StatRepositoryTest {
         StatEntity saved2 = repository.save(entity2);
 
         StatEntity entity3 = generateEntity();
-        entity2.setCreated(LocalDateTime.now().plusDays(2));
+        entity3.setCreated(LocalDateTime.now().plusDays(2));
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByCreatedBetween(LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1));
+        List<StatEntity> entities = repository.findAllByCreatedBetween(LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(2));
         StatEntity getEntity = entities.getFirst();
 
         assertEquals(2, entities.size());
