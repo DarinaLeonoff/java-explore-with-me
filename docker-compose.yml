@@ -1,8 +1,7 @@
 services:
   stats-server:
     build: ./stats/server
-    ports:
-      - "9090:9090"
+    network_mode: host
     environment:
       - SERVER_PORT=9090
 
@@ -24,8 +23,7 @@ services:
 
   ewm-service:
     build: ./ewm_main_service
-    ports:
-      - "8080:8080"
+    network_mode: hostя
 
   ewm-db:
     image: postgres:16.1
