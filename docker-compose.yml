@@ -1,8 +1,10 @@
 services:
   stats-server:
-    image: alpine:3.19
-    command: [ "sleep", "infinity" ]
-    network_mode: host
+    build: ./stats/server
+    ports:
+      - "9090:9090"
+    environment:
+      - SERVER_PORT=9090
 
   stats-db:
     image: postgres:16.1
@@ -21,9 +23,9 @@ services:
       retries: 10
 
   ewm-service:
-    image: alpine:3.19
-    command: [ "sleep", "infinity" ]
-    network_mode: host
+    build: ./ewm_main_service
+    ports:
+      - "8080:8080"
 
   ewm-db:
     image: postgres:16.1
