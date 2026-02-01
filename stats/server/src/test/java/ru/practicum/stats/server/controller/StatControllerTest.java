@@ -37,7 +37,7 @@ public class StatControllerTest {
     //hit tests
     @Test
     void hitShouldReturnOk() throws Exception {
-        StatsRequestDto dto = StatsRequestDto.builder().app("app").uri("/hit").ip("127.0.0.1").created(LocalDateTime.now()).build();
+        StatsRequestDto dto = StatsRequestDto.builder().app("app").uri("/hit").ip("127.0.0.1").timestamp(LocalDateTime.now()).build();
 
         mockMvc.perform(post("/hit").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated());
 
@@ -46,7 +46,7 @@ public class StatControllerTest {
 
     @Test
     void hitShouldReturnBadRequestWhenInvalidIp() throws Exception {
-        StatsRequestDto dto = StatsRequestDto.builder().app("app").uri("/hit").ip("999.999.999.999").created(LocalDateTime.now()).build();
+        StatsRequestDto dto = StatsRequestDto.builder().app("app").uri("/hit").ip("999.999.999.999").timestamp(LocalDateTime.now()).build();
 
         mockMvc.perform(post("/hit").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest());
 
@@ -55,7 +55,7 @@ public class StatControllerTest {
 
     @Test
     void hitShouldReturnBadRequestWhenAppIsNull() throws Exception {
-        StatsRequestDto dto = StatsRequestDto.builder().uri("/hit").ip("127.0.0.1").created(LocalDateTime.now()).build();
+        StatsRequestDto dto = StatsRequestDto.builder().uri("/hit").ip("127.0.0.1").timestamp(LocalDateTime.now()).build();
 
         mockMvc.perform(post("/hit").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest());
 

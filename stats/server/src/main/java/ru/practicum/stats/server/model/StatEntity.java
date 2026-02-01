@@ -24,5 +24,5 @@ public class StatEntity {
     @Column(name = "ip")
     private String ip;
     @Column(name = "created")
-    private LocalDateTime created;
+    private LocalDateTime timestamp;
 }

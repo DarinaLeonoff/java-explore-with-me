@@ -16,9 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StatsRequestDtoTest {
     private final ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 
-    String jsonString = "{\n" + "   \"app\":\"ewm-main-server\",\n" + "   \"uri\":\"/hit\",\n" + "   \"ip\":\"192.163.0.1\",\n" + "   \"created\":\"2022-09-06 11:00:00\"\n" + "}";
+    String jsonString = "{\n" + "   \"app\":\"ewm-main-server\",\n" + "   \"uri\":\"/hit\",\n" + "   \"ip\":\"192.163.0.1\",\n" + "   \"timestamp\":\"2022-09-06 11:00:00\"\n" + "}";
     LocalDateTime createDT = LocalDateTime.of(2022, 9, 6, 11, 0, 0);
-    StatsRequestDto dto = StatsRequestDto.builder().app("ewm-main-server").uri("/hit").ip("192.163.0.1").created(createDT).build();
+    StatsRequestDto dto = StatsRequestDto.builder().app("ewm-main-server").uri("/hit").ip("192.163.0.1").timestamp(createDT).build();
 
     @Test
     void testSerialization() throws IOException {
@@ -34,6 +34,6 @@ public class StatsRequestDtoTest {
         assertThat(content.getIp()).isEqualTo(dto.getIp());
         assertThat(content.getApp()).isEqualTo(dto.getApp());
         assertThat(content.getUri()).isEqualTo(dto.getUri());
-        assertThat(content.getCreated()).isEqualTo(dto.getCreated());
+        assertThat(content.getTimestamp()).isEqualTo(dto.getTimestamp());
     }
 }

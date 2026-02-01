@@ -18,7 +18,7 @@ public class StatEntityTest {
         assertEquals("app-name", entity.getApp());
         assertEquals("/test", entity.getUri());
         assertEquals("127.0.0.1", entity.getIp());
-        assertEquals(now, entity.getCreated());
+        assertEquals(now, entity.getTimestamp());
     }
 
     @Test
@@ -30,12 +30,12 @@ public class StatEntityTest {
         entity.setApp("service");
         entity.setUri("/stats");
         entity.setIp("192.168.0.1");
-        entity.setCreated(now);
+        entity.setTimestamp(now);
 
         assertEquals(2L, entity.getId());
         assertEquals("service", entity.getApp());
         assertEquals("/stats", entity.getUri());
         assertEquals("192.168.0.1", entity.getIp());
-        assertEquals(now, entity.getCreated());
+        assertEquals(now, entity.getTimestamp());
     }
 }

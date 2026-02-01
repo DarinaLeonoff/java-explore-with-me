@@ -48,13 +48,13 @@ public class StatServiceTest {
                 .app("main")
                 .uri("/uri")
                 .ip("1.1.1.1")
-                .created(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
         StatEntity entity = StatEntity.builder()
                 .app("main")
                 .uri("/uri")
                 .ip("1.1.1.1")
-                .created(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
 
         when(mapper.mapStatsRequestDtoToStatEntity(dto)).thenReturn(entity);
@@ -89,11 +89,11 @@ public class StatServiceTest {
         List<String> uris = List.of("/hit");
         Boolean unique = false;
 
-        when(repository.findAllByUriInAndCreatedBetween(uris, start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit"), entity("app", "/hit")));
+        when(repository.findAllByUriInAndTimestampBetween(uris, start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit"), entity("app", "/hit")));
 
         List<StatsResponseDto> result = service.getStats(start, end, uris, unique);
 
-        verify(repository).findAllByUriInAndCreatedBetween(uris, start, end);
+        verify(repository).findAllByUriInAndTimestampBetween(uris, start, end);
         verifyNoMoreInteractions(repository);
 
         assertThat(result).hasSize(1);
@@ -106,11 +106,11 @@ public class StatServiceTest {
         List<String> uris = null;
         Boolean unique = true;
 
-        when(repository.findAllByCreatedBetweenAndIpIsUnique(start, end)).thenReturn(List.of(entity("app1", "/hit"), entity("app2", "/hit")));
+        when(repository.findAllByTimestampBetweenAndIpIsUnique(start, end)).thenReturn(List.of(entity("app1", "/hit"), entity("app2", "/hit")));
 
         List<StatsResponseDto> result = service.getStats(start, end, uris, unique);
 
-        verify(repository).findAllByCreatedBetweenAndIpIsUnique(start, end);
+        verify(repository).findAllByTimestampBetweenAndIpIsUnique(start, end);
         verifyNoMoreInteractions(repository);
 
         assertThat(result).hasSize(2);
@@ -122,11 +122,11 @@ public class StatServiceTest {
         List<String> uris = null;
         Boolean unique = null;
 
-        when(repository.findAllByCreatedBetween(start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit"), entity("app", "/view")));
+        when(repository.findAllByTimestampBetween(start, end)).thenReturn(List.of(entity("app", "/hit"), entity("app", "/hit"), entity("app", "/view")));
 
         List<StatsResponseDto> result = service.getStats(start, end, uris, unique);
 
-        verify(repository).findAllByCreatedBetween(start, end);
+        verify(repository).findAllByTimestampBetween(start, end);
         verifyNoMoreInteractions(repository);
 
         assertThat(result).hasSize(2);

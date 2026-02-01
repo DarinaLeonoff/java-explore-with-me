@@ -14,8 +14,8 @@ public class StatMapperTest {
     private StatMapper mapper = Mappers.getMapper(StatMapper.class);
 
     private final LocalDateTime now = LocalDateTime.now();
-    private final StatEntity entity = StatEntity.builder().app("ewm-main-server").uri("/stats").ip("192.163.0.1").created(now).build();
-    private final StatsRequestDto dtoReq = StatsRequestDto.builder().app("ewm-main-server").uri("/stats").ip("192.163.0.1").created(now).build();
+    private final StatEntity entity = StatEntity.builder().app("ewm-main-server").uri("/stats").ip("192.163.0.1").timestamp(now).build();
+    private final StatsRequestDto dtoReq = StatsRequestDto.builder().app("ewm-main-server").uri("/stats").ip("192.163.0.1").timestamp(now).build();
 
     @Test
     void testConvertingRequestDtoToEntity() {
@@ -24,7 +24,7 @@ public class StatMapperTest {
         assertEquals(dtoReq.getIp(), result.getIp());
         assertEquals(dtoReq.getApp(), result.getApp());
         assertEquals(dtoReq.getUri(), result.getUri());
-        assertEquals(dtoReq.getCreated(), result.getCreated());
+        assertEquals(dtoReq.getTimestamp(), result.getTimestamp());
     }
 
     @Test

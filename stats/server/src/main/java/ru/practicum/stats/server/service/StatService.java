@@ -10,6 +10,7 @@ import ru.practicum.stats.server.model.StatEntity;
 import ru.practicum.stats.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class StatService {
     public void hit(StatsRequestDto dto) {
         StatEntity saved = repository.save(mapper.mapStatsRequestDtoToStatEntity(dto));
         log.info("Saved with id={}", saved.getId());
-        log.info("Saved with date={}", saved.getCreated());
+        log.info("Saved with date={}", saved.getTimestamp());
     }
 
     public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
@@ -34,13 +35,13 @@ public class StatService {
             entities = repository.findAllUniqueIpByUrisBetween(uris, start, end);
             log.info("Get unique visits with uris. Entities size is {}", entities.size());
         } else if (uris != null && !uris.isEmpty()) {
-            entities = repository.findAllByUriInAndCreatedBetween(uris, start, end);
+            entities = repository.findAllByUriInAndTimestampBetween(uris, start, end);
             log.info("Get all visits with uris: {}\n. Entities size is {}", uris.toArray(), entities.size());
         } else if (unique != null && unique) {
-            entities = repository.findAllByCreatedBetweenAndIpIsUnique(start, end);
+            entities = repository.findAllByTimestampBetweenAndIpIsUnique(start, end);
             log.info("Get unique visits. Entities size is {}", entities.size());
         } else {
-            entities = repository.findAllByCreatedBetween(start, end);
+            entities = repository.findAllByTimestampBetween(start, end);
             log.info("Get all visits. Entities size is {}", entities.size());
         }
 
@@ -66,7 +67,7 @@ public class StatService {
                                                 )
                                         )
                         )
-                        .toList();
+                        .toList().stream().sorted(Comparator.comparingInt(StatsResponseDto::getHits).reversed()).toList();
     }
 
 }

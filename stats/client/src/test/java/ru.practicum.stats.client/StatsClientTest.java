@@ -44,7 +44,7 @@ public class StatsClientTest {
         String uri = "/hit";
         String ip = "192.163.0.1";
 
-        StatsRequestDto dto = StatsRequestDto.builder().app(app).uri(uri).ip(ip).created(LocalDateTime.now()).build();
+        StatsRequestDto dto = StatsRequestDto.builder().app(app).uri(uri).ip(ip).timestamp(LocalDateTime.now()).build();
 
         ArgumentCaptor<HttpEntity<StatsRequestDto>> captor = ArgumentCaptor.forClass(HttpEntity.class);
 
@@ -62,7 +62,7 @@ public class StatsClientTest {
         assertThat(body.getApp()).isEqualTo(app);
         assertThat(body.getUri()).isEqualTo(uri);
         assertThat(body.getIp()).isEqualTo(ip);
-        assertThat(body.getCreated()).isNotNull();
+        assertThat(body.getTimestamp()).isNotNull();
 
         assertThat(headers.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }

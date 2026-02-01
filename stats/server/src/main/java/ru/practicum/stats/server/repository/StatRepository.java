@@ -10,34 +10,34 @@ import java.util.List;
 
 @Repository
 public interface StatRepository extends JpaRepository<StatEntity, Long> {
-    List<StatEntity> findAllByCreatedBetween(LocalDateTime start, LocalDateTime end);
+    List<StatEntity> findAllByTimestampBetween(LocalDateTime start, LocalDateTime end);
 
     @Query("""
                 SELECT s
                 FROM StatEntity s
-                WHERE s.created BETWEEN :start AND :end
+                WHERE s.timestamp BETWEEN :start AND :end
                   AND s.id = (
                       SELECT MIN(s2.id)
                       FROM StatEntity s2
                       WHERE s2.ip = s.ip
-                        AND s2.created BETWEEN :start AND :end
+                        AND s2.timestamp BETWEEN :start AND :end
                   )
             """)
-    List<StatEntity> findAllByCreatedBetweenAndIpIsUnique(LocalDateTime start, LocalDateTime end);
+    List<StatEntity> findAllByTimestampBetweenAndIpIsUnique(LocalDateTime start, LocalDateTime end);
 
-    List<StatEntity> findAllByUriInAndCreatedBetween(List<String> uris, LocalDateTime start, LocalDateTime end);
+    List<StatEntity> findAllByUriInAndTimestampBetween(List<String> uris, LocalDateTime start, LocalDateTime end);
 
     @Query("""
                 SELECT s
                     FROM StatEntity s
-                    WHERE s.created BETWEEN :start AND :end
+                    WHERE s.timestamp BETWEEN :start AND :end
                       AND s.uri IN :uris
-                      AND s.created = (
-                          SELECT MIN(s2.created)
+                      AND s.timestamp = (
+                          SELECT MIN(s2.timestamp)
                           FROM StatEntity s2
                           WHERE s2.ip = s.ip
                             AND s2.uri IN :uris
-                            AND s2.created BETWEEN :start AND :end
+                            AND s2.timestamp BETWEEN :start AND :end
                       )
             """)
     List<StatEntity> findAllUniqueIpByUrisBetween(List<String> uris, LocalDateTime start, LocalDateTime end);
