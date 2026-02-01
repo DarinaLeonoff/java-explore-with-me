@@ -23,7 +23,7 @@ services:
 
   ewm-service:
     build: ./ewm_main_service
-    network_mode: hostя
+    network_mode: host
 
   ewm-db:
     image: postgres:16.1
