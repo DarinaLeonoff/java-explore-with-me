@@ -10,7 +10,6 @@ import ru.practicum.stats.server.model.StatEntity;
 import ru.practicum.stats.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -31,10 +30,8 @@ public class StatService {
         List<String> safeUris = (uris == null || uris.isEmpty()) ? null : uris;
 
 
-        List<StatsResponseDto> result = Boolean.TRUE.equals(unique) ?
-                repository.findStatsUnique(start, end, safeUris) :
-                repository.findStats(start, end, safeUris);
+        List<StatsResponseDto> result = Boolean.TRUE.equals(unique) ? repository.findStatsUnique(start, end, safeUris) : repository.findStats(start, end, safeUris);
 
-        return result.stream().sorted(Comparator.comparingInt(StatsResponseDto::getHits).reversed()).toList();
+        return result;
     }
 }

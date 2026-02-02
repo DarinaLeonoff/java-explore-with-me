@@ -21,6 +21,7 @@ public interface StatRepository extends JpaRepository<StatEntity, Long> {
             where s.timestamp between :start and :end
             and (:uris is null or s.uri in :uris)
             group by s.app, s.uri
+            order by count(distinct s.ip) desc
             """)
     List<StatsResponseDto> findStatsUnique(LocalDateTime start, LocalDateTime end, List<String> uris);
 
@@ -34,6 +35,7 @@ public interface StatRepository extends JpaRepository<StatEntity, Long> {
             where s.timestamp between :start and :end
             and (:uris is null or s.uri in :uris)
             group by s.app, s.uri
+            order by count(s.id) desc
             """)
     List<StatsResponseDto> findStats(LocalDateTime start, LocalDateTime end, List<String> uris);
 }

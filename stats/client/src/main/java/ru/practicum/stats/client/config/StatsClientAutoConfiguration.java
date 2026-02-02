@@ -1,5 +1,6 @@
 package ru.practicum.stats.client.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -9,9 +10,11 @@ import ru.practicum.stats.client.StatsClientImpl;
 @Configuration
 public class StatsClientAutoConfiguration {
     @Bean
-    public StatsClientProperties statsClientProperties() {
+    public StatsClientProperties statsClientProperties(
+            @Value("${stats-server.url:http://localhost}") String url
+    ) {
         StatsClientProperties p = new StatsClientProperties();
-        p.setUrl("http://localhost"); // дефолт
+        p.setUrl(url); // дефолт
         return p;
     }
 
