@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.stats.server.model.StatEntity;
 
 import java.time.LocalDateTime;
@@ -46,25 +47,25 @@ public class StatRepositoryTest {
     void getByDatesTest() {
         StatEntity entity1 = generateEntity();
         StatEntity saved1 = repository.save(entity1);
+        log.info("Saved1 id = {}", saved1.getId());
 
         StatEntity entity2 = generateEntity();
         entity2.setTimestamp(LocalDateTime.now().minusDays(3));
         StatEntity saved2 = repository.save(entity2);
+        log.info("Saved2 id = {}", saved2.getId());
 
         StatEntity entity3 = generateEntity();
         entity3.setTimestamp(LocalDateTime.now().plusDays(2));
         StatEntity saved3 = repository.save(entity3);
+        log.info("Saved3 id = {}", saved3.getId());
 
-        List<StatEntity> entities = repository.findAllByTimestampBetween(LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(2));
-        StatEntity getEntity = entities.getFirst();
+        List<StatsResponseDto> entities = repository.findStats(LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(3), null);
+        StatsResponseDto getEntity = entities.getFirst();
 
-        assertEquals(2, entities.size());
-
+        assertEquals(1, entities.size());
+        assertEquals(2, getEntity.getHits());
         assertEquals(saved1.getApp(), getEntity.getApp());
         assertEquals(saved1.getUri(), getEntity.getUri());
-        assertEquals(saved1.getIp(), getEntity.getIp());
-        assertEquals(saved1.getTimestamp(), getEntity.getTimestamp());
-        assertEquals(saved1.getId(), getEntity.getId());
     }
 
     @Test
@@ -80,17 +81,15 @@ public class StatRepositoryTest {
         entity3.setUri("/hit/2");
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByUriInAndTimestampBetween(List.of("/hit"), LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2));
+        List<StatsResponseDto> entities = repository.findStats(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2), List.of("/hit"));
 
-        StatEntity getEntity = entities.getFirst();
+        StatsResponseDto getEntity = entities.getFirst();
 
-        assertEquals(2, entities.size());
+        assertEquals(1, entities.size());
 
+        assertEquals(2, getEntity.getHits());
         assertEquals(saved1.getApp(), getEntity.getApp());
         assertEquals(saved1.getUri(), getEntity.getUri());
-        assertEquals(saved1.getIp(), getEntity.getIp());
-        assertEquals(saved1.getTimestamp(), getEntity.getTimestamp());
-        assertEquals(saved1.getId(), getEntity.getId());
     }
 
     @Test
@@ -105,17 +104,14 @@ public class StatRepositoryTest {
         entity3.setIp("1.1.0.1");
         StatEntity saved3 = repository.save(entity3);
 
-        List<StatEntity> entities = repository.findAllByTimestampBetweenAndIpIsUnique(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2));
+        List<StatsResponseDto> entities = repository.findStatsUnique(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(2), null);
 
-        StatEntity getEntity = entities.getFirst();
+        StatsResponseDto getEntity = entities.getFirst();
 
-        assertEquals(2, entities.size());
-
+        assertEquals(1, entities.size());
+        assertEquals(2, getEntity.getHits());
         assertEquals(saved1.getApp(), getEntity.getApp());
         assertEquals(saved1.getUri(), getEntity.getUri());
-        assertEquals(saved1.getIp(), getEntity.getIp());
-        assertEquals(saved1.getTimestamp(), getEntity.getTimestamp());
-        assertEquals(saved1.getId(), getEntity.getId());
     }
 
     private StatEntity generateEntity() {
