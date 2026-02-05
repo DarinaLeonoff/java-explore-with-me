@@ -12,13 +12,14 @@ services:
   stats-db:
     image: postgres:16.1
     ports:
-      - "5432:5432"
+      - "5434:5434"
     volumes:
       - ./volumes/stats-postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=stats_db
       - POSTGRES_USER=stats_user
       - POSTGRES_PASSWORD=12345
+      - PGPORT=5434
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
