@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.exception.UserNotFound;
+import ru.practicum.ewm.exception.notFound.UserNotFound;
 import ru.practicum.ewm.user.dto.NewUserRequestDto;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.mapper.UserMapper;

@@ -16,17 +16,14 @@ public class UserDtoTest {
 
     @Test
     void shouldSerializeUserDto() throws Exception {
-        // given
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .build();
 
-        // when
         var jsonContent = jacksonTester.write(userDto);
 
-        // then
         assertThat(jsonContent).hasJsonPathNumberValue("$.id");
         assertThat(jsonContent).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(jsonContent).extractingJsonPathStringValue("$.name").isEqualTo("John Doe");
@@ -36,17 +33,14 @@ public class UserDtoTest {
 
     @Test
     void shouldDeserializeUserDto() throws Exception {
-        // given
         String json = "{\n" +
                 "  \"id\": \"2\",\n" +
                 "  \"name\": \"Jane Doe\",\n" +
                 "  \"email\": \"jane.doe@example.com\"\n" +
                 "}";
 
-        // when
         UserDto userDto = jacksonTester.parseObject(json);
 
-        // then
         assertThat(userDto.getId()).isEqualTo(2L);
         assertThat(userDto.getName()).isEqualTo("Jane Doe");
         assertThat(userDto.getEmail()).isEqualTo("jane.doe@example.com");

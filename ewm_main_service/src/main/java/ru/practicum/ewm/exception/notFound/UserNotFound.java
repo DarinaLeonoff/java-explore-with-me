@@ -1,4 +1,4 @@
-package ru.practicum.ewm.exception;
+package ru.practicum.ewm.exception.notFound;
 
 public class UserNotFound extends NotFoundException {
     public UserNotFound(long id) {
