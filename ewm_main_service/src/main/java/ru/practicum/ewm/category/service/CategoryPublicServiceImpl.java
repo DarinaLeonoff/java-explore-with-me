@@ -19,14 +19,12 @@ public class CategoryPublicServiceImpl implements CategoryPublicService {
     @Autowired
     private CategoryMapper mapper;
 
-    //todo
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("id").ascending());
         return repository.findCategories(pageable).stream().map(mapper::mapCategoryToDto).toList();
     }
 
-    //todo
     @Override
     public CategoryDto getCategory(int catId) {
         return mapper.mapCategoryToDto(repository.findById(catId).orElseThrow(() -> new CategoryNotFound(catId)));

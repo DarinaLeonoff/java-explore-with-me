@@ -1,5 +1,7 @@
 package ru.practicum.ewm.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -13,7 +15,7 @@ import ru.practicum.ewm.exception.notFound.NotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleWrongRequest(final MethodArgumentNotValidException e) {
@@ -23,6 +25,32 @@ public class GlobalExceptionHandler {
         String message = String.format("Field: %s. Error: %s. Value: %s", error.getField(), error.getDefaultMessage(), error.getRejectedValue());
 
         return new ErrorResponse(errors, HttpStatus.BAD_REQUEST.name(), "Incorrectly made request.", message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleConstraintViolation(ConstraintViolationException e) {
+
+        String[] errors = e.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .toArray(String[]::new);
+
+        ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+
+        String message = String.format(
+                "Field: %s. Error: %s. Value: %s",
+                violation.getPropertyPath(),
+                violation.getMessage(),
+                violation.getInvalidValue()
+        );
+
+        return new ErrorResponse(
+                errors,
+                HttpStatus.BAD_REQUEST.name(),
+                "Incorrectly made request.",
+                message
+        );
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

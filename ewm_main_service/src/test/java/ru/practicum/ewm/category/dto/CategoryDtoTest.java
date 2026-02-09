@@ -39,7 +39,7 @@ public class CategoryDtoTest {
     }
 
     @Test
-    void shouldDeserializeUserDto() throws Exception {
+    void shouldDeserializeCategoryDto() throws Exception {
         String json = "{\n" + "  \"id\": \"2\",\n" + "  \"name\": \"category name\"\n" + "}";
 
         CategoryDto dto = jacksonTester.parseObject(json);
