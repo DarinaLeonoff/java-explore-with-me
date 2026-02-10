@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,8 +33,8 @@ public class EventPublicController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    EventFullDto getEvent(@PathVariable long id) {
-        return service.getEvent(id);
+    EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) {
+        return service.getEvent(id, request.getRemoteAddr());
     }
 
 }

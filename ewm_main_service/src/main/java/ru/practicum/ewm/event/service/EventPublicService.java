@@ -9,5 +9,5 @@ public interface EventPublicService {
     List<EventShortDto> getEventList(String text, List<Integer> categories, Boolean paid, String rangeStart,
             String rangeEnd, Boolean onlyAvailable, SortType sort, int from, int size);
 
-    EventFullDto getEvent(long id);
+    EventFullDto getEvent(long id, String ip);
 }

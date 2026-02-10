@@ -50,11 +50,11 @@ public class EventPublicControllerTest {
     void shouldReturnEventById() throws Exception {
         EventFullDto dto = EventFullDto.builder().id(1L).title("Full event").annotation("annotation").views(100).build();
 
-        when(service.getEvent(1L)).thenReturn(dto);
+        when(service.getEvent(anyLong(), any())).thenReturn(dto);
 
         mockMvc.perform(get("/events/{id}", 1)).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1)).andExpect(jsonPath("$.title").value("Full event")).andExpect(jsonPath("$.views").value(100));
 
-        verify(service).getEvent(1L);
+        verify(service).getEvent(anyLong(), any());
     }
 
     @Test

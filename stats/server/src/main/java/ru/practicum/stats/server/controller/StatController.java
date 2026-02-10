@@ -23,6 +23,7 @@ public class StatController {
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public void hitNewStat(@Valid @RequestBody StatsRequestDto dto) {
+        log.info("hit to stats. uri = {}. ip = {}", dto.getUri(), dto.getIp());
         service.hit(dto);
     }
 

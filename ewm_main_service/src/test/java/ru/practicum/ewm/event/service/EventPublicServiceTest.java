@@ -16,6 +16,7 @@ import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
+import ru.practicum.stats.client.StatsClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +35,8 @@ public class EventPublicServiceTest {
 
     @Mock
     private EventMapper mapper;
+    @Mock
+    private StatsClient client;
 
     @InjectMocks
     private EventPublicServiceImpl service;
@@ -42,67 +45,33 @@ public class EventPublicServiceTest {
     @Test
     void shouldReturnEventShortDtoList() {
         // given
-        Event event = Event.builder()
-                .id(1L)
-                .build();
+        Event event = Event.builder().id(1L).build();
 
-        EventShortDto dto = EventShortDto.builder()
-                .id(1L)
-                .build();
+        EventShortDto dto = EventShortDto.builder().id(1L).build();
 
-        when(repository.getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class)
-        )).thenReturn(new PageImpl<>(List.of(event)));
+        when(repository.getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(event)));
 
         when(mapper.mapEventToShortDto(event)).thenReturn(dto);
 
         // when
-        List<EventShortDto> result = service.getEventList(
-                "text",
-                List.of(1, 2),
-                true,
-                "2026-01-01T00:00:00",
-                "2026-12-31T00:00:00",
-                true,
-                SortType.EVENT_DATE,
-                0,
-                10
-        );
+        List<EventShortDto> result = service.getEventList("text", List.of(1, 2), true, "2026-01-01T00:00:00", "2026-12-31T00:00:00", true, SortType.EVENT_DATE, 0, 10);
 
         // then
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
 
-        verify(repository).getEventsByFilters(
-                eq("text"),
-                eq(List.of(1, 2)),
-                eq(true),
-                eq(LocalDateTime.parse("2026-01-01T00:00:00")),
-                eq(LocalDateTime.parse("2026-12-31T00:00:00")),
-                eq(true),
-                any(Pageable.class)
-        );
+        verify(repository).getEventsByFilters(eq("text"), eq(List.of(1, 2)), eq(true), eq(LocalDateTime.parse("2026-01-01T00:00:00")), eq(LocalDateTime.parse("2026-12-31T00:00:00")), eq(true), any(Pageable.class));
     }
 
     //sorted by view
     @Test
     void shouldSortByViewsWhenSortTypeViews() {
-        when(repository.getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class)
-        )).thenReturn(Page.empty());
+        when(repository.getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class))).thenReturn(Page.empty());
 
-        service.getEventList(
-                null, null, null,
-                null, null,
-                false,
-                SortType.VIEWS,
-                0, 10
-        );
+        service.getEventList(null, null, null, null, null, false, SortType.VIEWS, 0, 10);
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(repository).getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), captor.capture()
-        );
+        verify(repository).getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), captor.capture());
 
         Pageable pageable = captor.getValue();
         Sort.Order order = pageable.getSort().iterator().next();
@@ -114,22 +83,12 @@ public class EventPublicServiceTest {
     //sorted by eventdate
     @Test
     void shouldSortByDateWhenSortTypeEventDate() {
-        when(repository.getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class)
-        )).thenReturn(Page.empty());
+        when(repository.getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class))).thenReturn(Page.empty());
 
-        service.getEventList(
-                null, null, null,
-                null, null,
-                false,
-                SortType.EVENT_DATE,
-                0, 10
-        );
+        service.getEventList(null, null, null, null, null, false, SortType.EVENT_DATE, 0, 10);
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(repository).getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), captor.capture()
-        );
+        verify(repository).getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), captor.capture());
 
         Pageable pageable = captor.getValue();
         Sort.Order order = pageable.getSort().iterator().next();
@@ -142,27 +101,11 @@ public class EventPublicServiceTest {
     //filter available only = false
     @Test
     void shouldPassOnlyAvailableFalse() {
-        when(repository.getEventsByFilters(
-                any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class)
-        )).thenReturn(Page.empty());
+        when(repository.getEventsByFilters(any(), any(), any(), any(), any(), anyBoolean(), any(Pageable.class))).thenReturn(Page.empty());
 
-        service.getEventList(
-                null, null, null,
-                null, null,
-                false,
-                null,
-                0, 10
-        );
+        service.getEventList(null, null, null, null, null, false, null, 0, 10);
 
-        verify(repository).getEventsByFilters(
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                eq(false),
-                any(Pageable.class)
-        );
+        verify(repository).getEventsByFilters(isNull(), isNull(), isNull(), isNull(), isNull(), eq(false), any(Pageable.class));
     }
 
     @Test
@@ -173,7 +116,7 @@ public class EventPublicServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(event));
         when(mapper.mapEventToFullDto(event)).thenReturn(dto);
 
-        EventFullDto result = service.getEvent(1L);
+        EventFullDto result = service.getEvent(1L, "1.1.1.1");
 
         assertThat(result.getId()).isEqualTo(1L);
     }
@@ -182,8 +125,7 @@ public class EventPublicServiceTest {
     void shouldThrowExceptionWhenEventNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.getEvent(1L))
-                .isInstanceOf(EventNotFound.class);
+        assertThatThrownBy(() -> service.getEvent(1L, "1.1.1.1")).isInstanceOf(EventNotFound.class);
     }
 }
 
