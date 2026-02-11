@@ -35,8 +35,15 @@ public class EventPrivateController {
         return eventPrivateService.getUserEvents(userId, from, size);
     }
 
+    @GetMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+        //событие из числа добавленных юзером
+    EventFullDto getUserEventById(@PathVariable long userId, @PathVariable long eventId) {
+        return eventPrivateService.getUserEventById(userId, eventId);
+    }
+
     //    todo privateGet
-//    todo privateGet
+
 //    todo privateGet
 //    todo privatePatch
 //    todo privatePatch

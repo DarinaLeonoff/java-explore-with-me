@@ -10,4 +10,6 @@ public interface EventPrivateService {
     EventFullDto postNewEvent(NewEventDto dto, long userId);
 
     List<EventShortDto> getUserEvents(long userId, int from, int size);
+
+    EventFullDto getUserEventById(long userId, long eventId);
 }

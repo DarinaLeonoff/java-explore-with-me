@@ -16,15 +16,16 @@ import ru.practicum.ewm.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class EventRepositoryTest {
-        @Autowired
-        private EventRepository eventRepository;
+    @Autowired
+    private EventRepository eventRepository;
 
-        @Autowired
-        private TestEntityManager em;
+    @Autowired
+    private TestEntityManager em;
 
 
     private Category music;
@@ -36,56 +37,16 @@ public class EventRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        music = em.persist(
-                Category.builder()
-                        .name("Music")
-                        .build()
-        );
+        music = em.persist(Category.builder().name("Music").build());
 
-        sport = em.persist(
-                Category.builder()
-                        .name("Sport")
-                        .build()
-        );
+        sport = em.persist(Category.builder().name("Sport").build());
 
         initiator = em.persist(User.builder().name("User for test").email("name@ya.ru").build());
 
-        availablePaidEvent = em.persist(
-                Event.builder()
-                        .createdOn(LocalDateTime.now())
-                        .initiator(initiator)
-                        .title("Rock Concert")
-                        .annotation("Great music concert")
-                        .description("Big open air rock concert in the city center")
-                        .eventDate(LocalDateTime.now().plusDays(10))
-                        .category(music)
-                        .paid(true)
-                        .participantLimit(100)
-                        .confirmedRequests(10)
-                        .requestModeration(true)
-                        .state(EventState.PUBLISHED)
-                        .location(new Location(55.75, 37.61))
-                        .views(0)
-                        .build());
+        availablePaidEvent = em.persist(Event.builder().createdOn(LocalDateTime.now()).initiator(initiator).title("Rock Concert").annotation("Great music concert").description("Big open air rock concert in the city center").eventDate(LocalDateTime.now().plusDays(10)).category(music).paid(true).participantLimit(100).confirmedRequests(10).requestModeration(true).state(EventState.PUBLISHED).location(new Location(55.75, 37.61)).views(0).build());
 
-        unavailableFreeEvent = em.persist(
-                Event.builder()
-                        .createdOn(LocalDateTime.now())
-                        .initiator(initiator)
-                        .title("Local Football Match")
-                        .annotation("Sport event")
-                        .description("Football championship match")
-                        .eventDate(LocalDateTime.now().plusDays(5))
-                        .category(sport)
-                        .paid(false)
-                        .participantLimit(10)
-                        .confirmedRequests(10) // уже заполнен → недоступен
-                        .requestModeration(false)
-                        .state(EventState.PUBLISHED)
-                        .location(new Location(59.93, 30.31))
-                        .views(0)
-                        .build()
-        );
+        unavailableFreeEvent = em.persist(Event.builder().createdOn(LocalDateTime.now()).initiator(initiator).title("Local Football Match").annotation("Sport event").description("Football championship match").eventDate(LocalDateTime.now().plusDays(5)).category(sport).paid(false).participantLimit(10).confirmedRequests(10) // уже заполнен → недоступен
+                .requestModeration(false).state(EventState.PUBLISHED).location(new Location(59.93, 30.31)).views(0).build());
 
         em.flush();
         em.clear();
@@ -93,15 +54,7 @@ public class EventRepositoryTest {
 
     @Test
     void shouldFindByTextInAnnotationOrDescription() {
-        Page<Event> result = eventRepository.getEventsByFilters(
-                "concert",
-                null,
-                null,
-                null,
-                null,
-                false,
-                PageRequest.of(0, 10)
-        );
+        Page<Event> result = eventRepository.getEventsByFilters("concert", null, null, null, null, false, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
         assertEquals(availablePaidEvent.getId(), result.getContent().get(0).getId());
@@ -109,15 +62,7 @@ public class EventRepositoryTest {
 
     @Test
     void shouldFilterByPaid() {
-        Page<Event> result = eventRepository.getEventsByFilters(
-                null,
-                null,
-                true,
-                null,
-                null,
-                false,
-                PageRequest.of(0, 10)
-        );
+        Page<Event> result = eventRepository.getEventsByFilters(null, null, true, null, null, false, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
         assertTrue(result.getContent().get(0).getPaid());
@@ -125,15 +70,7 @@ public class EventRepositoryTest {
 
     @Test
     void shouldFilterByCategories() {
-        Page<Event> result = eventRepository.getEventsByFilters(
-                null,
-                List.of(music.getId().intValue()),
-                null,
-                null,
-                null,
-                false,
-                PageRequest.of(0, 10)
-        );
+        Page<Event> result = eventRepository.getEventsByFilters(null, List.of(music.getId().intValue()), null, null, null, false, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
         assertEquals(music.getId(), result.getContent().get(0).getCategory().getId());
@@ -141,15 +78,7 @@ public class EventRepositoryTest {
 
     @Test
     void shouldFilterByDateRange() {
-        Page<Event> result = eventRepository.getEventsByFilters(
-                null,
-                null,
-                null,
-                LocalDateTime.now().plusDays(6),
-                LocalDateTime.now().plusDays(15),
-                false,
-                PageRequest.of(0, 10)
-        );
+        Page<Event> result = eventRepository.getEventsByFilters(null, null, null, LocalDateTime.now().plusDays(6), LocalDateTime.now().plusDays(15), false, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
         assertEquals(availablePaidEvent.getId(), result.getContent().get(0).getId());
@@ -157,17 +86,16 @@ public class EventRepositoryTest {
 
     @Test
     void shouldReturnOnlyAvailableEvents() {
-        Page<Event> result = eventRepository.getEventsByFilters(
-                null,
-                null,
-                null,
-                null,
-                null,
-                true,
-                PageRequest.of(0, 10)
-        );
+        Page<Event> result = eventRepository.getEventsByFilters(null, null, null, null, null, true, PageRequest.of(0, 10));
 
         assertEquals(1, result.getTotalElements());
         assertEquals(availablePaidEvent.getId(), result.getContent().get(0).getId());
+    }
+
+    @Test
+    void getEventByUserAndId() {
+        Event eve = eventRepository.findByIdAndInitiatorId(availablePaidEvent.getId(), initiator.getId());
+
+        assertEquals(availablePaidEvent.getId(), eve.getId());
     }
 }

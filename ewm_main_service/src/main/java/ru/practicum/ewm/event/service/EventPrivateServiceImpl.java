@@ -47,5 +47,11 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         return events.stream().map(mapper::mapEventToShortDto).toList();
     }
 
+    @Override
+    public EventFullDto getUserEventById(long userId, long eventId) {
+        Event event = repository.findByIdAndInitiatorId(eventId, userId);
+        return mapper.mapEventToFullDto(event);
+    }
+
 
 }
