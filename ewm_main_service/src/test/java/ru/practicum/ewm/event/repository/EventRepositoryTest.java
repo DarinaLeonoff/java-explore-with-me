@@ -52,33 +52,38 @@ public class EventRepositoryTest {
 
         availablePaidEvent = em.persist(
                 Event.builder()
-                        .annotation("Great concert")
-                        .description("Live music event")
-                        .title("Title")
-                        .paid(true)
-                        .category(music)
+                        .createdOn(LocalDateTime.now())
                         .initiator(initiator)
+                        .title("Rock Concert")
+                        .annotation("Great music concert")
+                        .description("Big open air rock concert in the city center")
                         .eventDate(LocalDateTime.now().plusDays(10))
+                        .category(music)
+                        .paid(true)
                         .participantLimit(100)
                         .confirmedRequests(10)
+                        .requestModeration(true)
                         .state(EventState.PUBLISHED)
-                        .location(Location.builder().lon(22.2).lat(55.3).build())
-                        .build()
-        );
+                        .location(new Location(55.75, 37.61))
+                        .views(0)
+                        .build());
 
         unavailableFreeEvent = em.persist(
                 Event.builder()
-                        .annotation("Morning run")
-                        .description("Free sport event")
-                        .title("Title")
-                        .paid(false)
+                        .createdOn(LocalDateTime.now())
                         .initiator(initiator)
-                        .category(sport)
+                        .title("Local Football Match")
+                        .annotation("Sport event")
+                        .description("Football championship match")
                         .eventDate(LocalDateTime.now().plusDays(5))
+                        .category(sport)
+                        .paid(false)
                         .participantLimit(10)
-                        .confirmedRequests(10)
+                        .confirmedRequests(10) // уже заполнен → недоступен
+                        .requestModeration(false)
                         .state(EventState.PUBLISHED)
-                        .location(Location.builder().lon(22.2).lat(55.3).build())
+                        .location(new Location(59.93, 30.31))
+                        .views(0)
                         .build()
         );
 
