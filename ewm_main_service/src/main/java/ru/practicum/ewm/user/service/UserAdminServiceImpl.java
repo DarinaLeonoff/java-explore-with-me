@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class UserAdminServiceImpl implements UserService {
+public class UserAdminServiceImpl implements UserAdminService {
     @Autowired
     private UserRepository userRepository;
     @Autowired

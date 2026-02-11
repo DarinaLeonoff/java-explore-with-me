@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.NewUserRequestDto;
 import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.service.UserService;
+import ru.practicum.ewm.user.service.UserAdminService;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/admin/users")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private UserAdminService userService;
 
     //    получение информации о пользователях (List<UserDto>)
     @GetMapping()

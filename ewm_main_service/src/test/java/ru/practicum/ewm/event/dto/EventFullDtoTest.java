@@ -36,7 +36,7 @@ public class EventFullDtoTest {
         assertThat(json).extractingJsonPathStringValue("$.category.name").isEqualTo("category");
 
         assertThat(json).extractingJsonPathNumberValue("$.confirmedRequests").isEqualTo(5);
-        assertThat(json).extractingJsonPathStringValue("$.createdOn").isEqualTo("2026-02-01T10:00:00");
+        assertThat(json).extractingJsonPathStringValue("$.createdOn").isEqualTo("2026-02-01 10:00:00");
 
         assertThat(json).extractingJsonPathStringValue("$.description").isEqualTo("description");
         assertThat(json).extractingJsonPathStringValue("$.eventDate").isEqualTo("2026-03-10 18:30:00");
@@ -50,7 +50,7 @@ public class EventFullDtoTest {
         assertThat(json).extractingJsonPathBooleanValue("$.paid").isTrue();
         assertThat(json).extractingJsonPathNumberValue("$.participantLimit").isEqualTo(100);
 
-        assertThat(json).extractingJsonPathStringValue("$.publishedOn").isEqualTo("2026-02-05T12:00:00");
+        assertThat(json).extractingJsonPathStringValue("$.publishedOn").isEqualTo("2026-02-05 12:00:00");
 
         assertThat(json).extractingJsonPathBooleanValue("$.requestModeration").isTrue();
         assertThat(json).extractingJsonPathStringValue("$.state").isEqualTo("PUBLISHED");
@@ -60,7 +60,33 @@ public class EventFullDtoTest {
 
     @Test
     void shouldDeserializeEventFullDto() throws Exception {
-        String json = "{\n" + "  \"id\": 1,\n" + "  \"annotation\": \"annotation\",\n" + "  \"category\": {\n" + "    \"id\": 10,\n" + "    \"name\": \"category\"\n" + "  },\n" + "  \"confirmedRequests\": 5,\n" + "  \"createdOn\": \"2026-02-01T10:00:00\",\n" + "  \"description\": \"description\",\n" + "  \"eventDate\": \"2026-03-10T18:30:00\",\n" + "  \"initiator\": {\n" + "    \"id\": 2,\n" + "    \"name\": \"initiator\"\n" + "  },\n" + "  \"location\": {\n" + "    \"lat\": 55.75,\n" + "    \"lon\": 37.61\n" + "  },\n" + "  \"paid\": true,\n" + "  \"participantLimit\": 100,\n" + "  \"publishedOn\": \"2026-02-05T12:00:00\",\n" + "  \"requestModeration\": true,\n" + "  \"state\": \"PUBLISHED\",\n" + "  \"title\": \"title\",\n" + "  \"views\": 42\n" + "}";
+        String json = "{\n" +
+                "  \"id\": 1,\n" +
+                "  \"annotation\": \"annotation\",\n" +
+                "  \"category\": {\n" +
+                "    \"id\": 10,\n" +
+                "    \"name\": \"category\"\n" +
+                "  },\n" +
+                "  \"confirmedRequests\": 5,\n" +
+                "  \"createdOn\": \"2026-02-01 10:00:00\",\n" +
+                "  \"description\": \"description\",\n" +
+                "  \"eventDate\": \"2026-03-10 18:30:00\",\n" +
+                "  \"initiator\": {\n" +
+                "    \"id\": 2,\n" +
+                "    \"name\": \"initiator\"\n" +
+                "  },\n" +
+                "  \"location\": {\n" +
+                "    \"lat\": 55.75,\n" +
+                "    \"lon\": 37.61\n" +
+                "  },\n" +
+                "  \"paid\": true,\n" +
+                "  \"participantLimit\": 100,\n" +
+                "  \"publishedOn\": \"2026-02-05 12:00:00\",\n" +
+                "  \"requestModeration\": true,\n" +
+                "  \"state\": \"PUBLISHED\",\n" +
+                "  \"title\": \"title\",\n" +
+                "  \"views\": 42\n" +
+                "}";
 
         EventFullDto dto = tester.parseObject(json);
 

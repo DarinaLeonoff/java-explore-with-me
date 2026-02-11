@@ -44,7 +44,23 @@ public class EventShortDtoTest {
 
     @Test
     void shouldDeserializeEventShortDto() throws Exception {
-        String json = "{\n" + "  \"id\": 2,\n" + "  \"annotation\": \"annot\",\n" + "  \"category\": {\n" + "    \"id\": 1,\n" + "    \"name\": \"cat\"\n" + "  },\n" + "  \"confirmedRequests\": 1,\n" + "  \"eventDate\": \"2026-02-11T12:00:00\",\n" + "  \"initiator\": {\n" + "    \"id\": 1,\n" + "    \"name\": \"Name\"\n" + "  },\n" + "  \"paid\": false,\n" + "  \"title\": \"Title\",\n" + "  \"views\": 20\n" + "}";
+        String json = "{\n" +
+                "  \"id\": 2,\n" +
+                "  \"annotation\": \"annot\",\n" +
+                "  \"category\": {\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"cat\"\n" +
+                "  },\n" +
+                "  \"confirmedRequests\": 1,\n" +
+                "  \"eventDate\": \"2026-02-11 12:00:00\",\n" +
+                "  \"initiator\": {\n" +
+                "    \"id\": 1,\n" +
+                "    \"name\": \"Name\"\n" +
+                "  },\n" +
+                "  \"paid\": false,\n" +
+                "  \"title\": \"Title\",\n" +
+                "  \"views\": 20\n" +
+                "}";
 
         EventShortDto dto = jacksonTester.parseObject(json);
 
