@@ -44,9 +44,8 @@ public class EventPublicServiceImpl implements EventPublicService {
 
     @Override
     public EventFullDto getEvent(long id, String ip) {
-        // todo set stat
         Event event = repository.findById(id).orElseThrow(() -> new EventNotFound(id));
-        client.hit("ewm_main_service", "/events/" + id, ip);
+        client.hit(Constants.APP, Constants.getEventUri(id), ip);
         return mapper.mapEventToFullDto(event);
     }
 

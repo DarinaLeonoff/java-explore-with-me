@@ -8,7 +8,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.service.CategoryPublicService;
-import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.updateDto.StateUserAction;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.mapper.EventMapper;
@@ -17,6 +19,7 @@ import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.service.UserPublicService;
+import ru.practicum.stats.client.StatsClient;
 
 import java.util.List;
 
@@ -26,6 +29,8 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     private EventRepository repository;
     @Autowired
     private EventMapper mapper;
+    @Autowired
+    private StatsClient client;
 
     @Autowired
     private CategoryPublicService categoryService;
