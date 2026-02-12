@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.constants.Constants;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = Constants.DATE_FORMATE)
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
@@ -37,7 +38,7 @@ public class Event {
     @Column(name = "description", length = 7000)
     private String description;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = Constants.DATE_FORMATE)
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
@@ -51,7 +52,7 @@ public class Event {
     @Column(name = "participant_limit")
     private int participantLimit;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = Constants.DATE_FORMATE)
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
 

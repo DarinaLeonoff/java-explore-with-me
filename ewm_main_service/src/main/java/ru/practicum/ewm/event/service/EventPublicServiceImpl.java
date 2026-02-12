@@ -5,12 +5,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.constants.Constants;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.event.repository.EventSpecification;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 import ru.practicum.stats.client.StatsClient;
 
@@ -30,8 +33,11 @@ public class EventPublicServiceImpl implements EventPublicService {
     public List<EventShortDto> getEventList(String text, List<Integer> categories, Boolean paid, String rangeStart,
             String rangeEnd, Boolean onlyAvailable, SortType sort, int from, int size) {
 
+        LocalDateTime start = rangeStart == null ? null : LocalDateTime.parse(rangeStart, Constants.DATE_FORMATTER);
+        LocalDateTime end = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, Constants.DATE_FORMATTER);
+        Specification<Event> spec = EventSpecification.withPublicFilters(text, categories, paid, start, end, onlyAvailable);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(sort == SortType.VIEWS ? "views" : "eventDate").descending());
-        Page<Event> res = repository.getEventsByFilters(text, categories, paid, rangeStart != null ? LocalDateTime.parse(rangeStart) : null, rangeEnd != null ? LocalDateTime.parse(rangeEnd) : null, onlyAvailable.equals(true), pageable);
+        Page<Event> res = repository.findAll(spec, pageable);
         //todo get views
         return res.stream().map(mapper::mapEventToShortDto).toList();
     }
