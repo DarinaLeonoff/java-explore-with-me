@@ -20,6 +20,7 @@ public class EventPublicController {
     @Autowired
     private EventPublicService service;
 
+    //todo
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<EventShortDto> getEventList(@RequestParam(required = false) String text,

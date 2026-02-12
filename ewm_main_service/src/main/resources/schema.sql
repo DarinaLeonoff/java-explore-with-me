@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS events(
     created_on TIMESTAMP WITHOUT TIME ZONE,
 
     initiator_id BIGINT NOT NULL,
-    category_id BIGINT NOT NULL,
+    category_id INTEGER NOT NULL,
 
     title VARCHAR(120) NOT NULL,
     annotation VARCHAR(2000) NOT NULL,

@@ -3,7 +3,7 @@ package ru.practicum.ewm.event.service;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
 
 import java.util.List;
 

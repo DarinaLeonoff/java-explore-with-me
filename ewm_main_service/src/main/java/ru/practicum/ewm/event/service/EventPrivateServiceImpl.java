@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.service.CategoryPublicService;
 import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.event.dto.updateDto.StateUserAction;
+import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
@@ -63,11 +65,9 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             category = null;
         }
         Event updated = mapper.updateEvent(event, request, category);
-        if (request.getStateAction() == StateAction.CANCEL_REVIEW) {
+        if (request.getStateAction() == StateUserAction.CANCEL_REVIEW) {
             updated.setState(EventState.CANCELED);
         }
         return mapper.mapEventToFullDto(repository.save(updated));
     }
-
-
 }
