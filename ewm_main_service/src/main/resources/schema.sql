@@ -43,4 +43,16 @@ CREATE TABLE IF NOT EXISTS events(
     CONSTRAINT fk_event_category
     FOREIGN KEY (category_id)
     REFERENCES categories (id)
-)
+);
+
+CREATE TABLE IF NOT EXISTS requests(
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_event_id FOREIGN KEY (event_id) REFERENCES events (id),
+    CONSTRAINT unique_user_event UNIQUE (user_id, event_id)
+    );
+
