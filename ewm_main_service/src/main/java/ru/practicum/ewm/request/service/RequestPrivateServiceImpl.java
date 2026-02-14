@@ -1,12 +1,15 @@
 package ru.practicum.ewm.request.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.AccessException;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exception.AccessRightsException;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 import ru.practicum.ewm.exception.notFound.RequestNotFound;
 import ru.practicum.ewm.exception.notFound.UserNotFound;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.request.mapper.RequestMapper;
 import ru.practicum.ewm.request.model.Request;
@@ -17,6 +20,7 @@ import ru.practicum.ewm.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RequestPrivateServiceImpl implements RequestPrivateService {
@@ -36,8 +40,7 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
 
         LocalDateTime created = LocalDateTime.now();
 
-        Request newRequest = Request.builder().user(user).event(event)
-                .status(RequestState.PENDING).created(created).build();
+        Request newRequest = Request.builder().user(user).event(event).status(RequestState.PENDING).created(created).build();
         return mapper.mapRequestToDto(requestRepository.save(newRequest));
     }
 
@@ -54,4 +57,29 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
         request.setStatus(RequestState.CANCELED);
         return mapper.mapRequestToDto(requestRepository.save(request));
     }
+
+    @Override
+    public List<ParticipationRequestDto> getEventRequests(long userId, long eventId) {
+        return requestRepository.findAllByEventId(eventId).stream().map(mapper::mapRequestToDto).toList();
+    }
+
+    @Override
+    public Map<String, List<ParticipationRequestDto>> acceptRequest(long userId, long eventId,
+            EventRequestStatusUpdateRequest request) throws AccessException {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
+        if (event.getInitiator().getId() != userId) {
+            throw new AccessRightsException("User " + userId + " is not initiator of event.");
+        }
+
+        List<Request> requests = requestRepository.findAllByEventId(eventId);
+
+        List<ParticipationRequestDto> updated = requests.stream().filter(u -> request.getRequestIds().contains(u.getId())).map(u -> {
+            u.setStatus(request.getStatus());
+            return mapper.mapRequestToDto(u);
+        }).toList();
+
+        return Map.of(request.getStatus() == RequestState.CONFIRMED ? "confirmedRequests" : "rejectedRequests",
+                updated);
+    }
+
 }

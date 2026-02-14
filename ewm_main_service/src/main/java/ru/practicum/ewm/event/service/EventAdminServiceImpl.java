@@ -24,7 +24,6 @@ import ru.practicum.ewm.exception.notFound.EventNotFound;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 public class EventAdminServiceImpl implements EventAdminService {
 
@@ -40,8 +39,6 @@ public class EventAdminServiceImpl implements EventAdminService {
     @Override
     public List<EventFullDto> getEvent(List<Long> users, List<String> states, List<Integer> categories,
             String rangeStart, String rangeEnd, int from, int size) {
-        users.remove(0L);
-        categories.remove((Integer) 0);
         LocalDateTime start = rangeStart == null ? null : LocalDateTime.parse(rangeStart, Constants.DATE_FORMATTER);
         LocalDateTime end = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, Constants.DATE_FORMATTER);
         Specification<Event> spec = EventSpecification.withAdminFilters(users, states, categories, start, end);

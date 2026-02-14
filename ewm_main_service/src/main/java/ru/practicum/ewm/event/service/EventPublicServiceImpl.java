@@ -38,7 +38,6 @@ public class EventPublicServiceImpl implements EventPublicService {
         Specification<Event> spec = EventSpecification.withPublicFilters(text, categories, paid, start, end, onlyAvailable);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(sort == SortType.VIEWS ? "views" : "eventDate").descending());
         Page<Event> res = repository.findAll(spec, pageable);
-        //todo get views
         return res.stream().map(mapper::mapEventToShortDto).toList();
     }
 
@@ -48,6 +47,4 @@ public class EventPublicServiceImpl implements EventPublicService {
         client.hit(Constants.APP, Constants.getEventUri(id), ip);
         return mapper.mapEventToFullDto(event);
     }
-
-    //todo get stats
 }

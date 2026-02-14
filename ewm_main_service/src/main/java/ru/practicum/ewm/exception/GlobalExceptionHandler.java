@@ -66,4 +66,10 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(null, HttpStatus.NOT_FOUND.name(), "The required object was not found.", e.getMessage());
     }
 
+    @ExceptionHandler(AccessRightsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleNotFound(AccessRightsException e) {
+        return new ErrorResponse(null, HttpStatus.BAD_REQUEST.name(), "User don't have rights for action.", e.getMessage());
+    }
+
 }

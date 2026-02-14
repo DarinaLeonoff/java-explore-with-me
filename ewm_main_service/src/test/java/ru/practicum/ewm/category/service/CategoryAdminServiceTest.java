@@ -10,10 +10,11 @@ import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,10 +67,26 @@ public class CategoryAdminServiceTest {
     }
 
     @Test
+    void updateCategoryFallTest() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFound.class,
+                () -> service.aditCategory(any(), 1));
+    }
+
+    @Test
     void deleteCategoryTest() {
         Category category = Category.builder().id(1).name("cat").build();
         when(repository.findById(1)).thenReturn(Optional.ofNullable(category));
         service.removeCategory(1);
         verify(repository, times(1)).deleteById(anyInt());
+    }
+
+    @Test
+    void deleteeCategoryFallTest() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFound.class,
+                () -> service.removeCategory(1));
     }
 }

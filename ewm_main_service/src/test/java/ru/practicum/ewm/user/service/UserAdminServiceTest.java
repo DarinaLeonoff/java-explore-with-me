@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import ru.practicum.ewm.exception.notFound.UserNotFound;
 import ru.practicum.ewm.user.dto.NewUserRequestDto;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.mapper.UserMapper;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,11 +41,7 @@ public class UserAdminServiceTest {
     @BeforeEach
     void setup() {
         req = NewUserRequestDto.builder().name("new user name").email("newUser@ya.ru").build();
-        user = new User();
-        user.setId(1L);
-        user.setName("John Doe");
-        user.setEmail("john@ya.ru");
-
+        user = User.builder().id(1L).name("John Doe").email("john@ya.ru").build();
         dto = new UserDto(1L, "John Doe", "john@ya.ru");
     }
 
@@ -102,5 +100,17 @@ public class UserAdminServiceTest {
 
         verify(userRepository).findById(userId);
         verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteUserFallTest() {
+        long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFound.class,
+                () -> userService.deleteUser(userId));
+
+        verify(userRepository).findById(userId);
     }
 }

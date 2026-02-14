@@ -12,12 +12,16 @@ import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.exception.notFound.CategoryNotFound;
+import ru.practicum.ewm.exception.notFound.EventNotFound;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryPublicServiceTest {
@@ -63,5 +67,14 @@ public class CategoryPublicServiceTest {
 
         assertEquals(1, res.getId());
         assertEquals("name 1", res.getName());
+    }
+
+    @Test
+    void getCategoryByIdFallTest() {
+
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFound.class,
+                () -> service.getCategory(1));
     }
 }

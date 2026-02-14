@@ -19,7 +19,6 @@ import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.service.UserPublicService;
-import ru.practicum.stats.client.StatsClient;
 
 import java.util.List;
 
@@ -29,8 +28,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     private EventRepository repository;
     @Autowired
     private EventMapper mapper;
-    @Autowired
-    private StatsClient client;
 
     @Autowired
     private CategoryPublicService categoryService;

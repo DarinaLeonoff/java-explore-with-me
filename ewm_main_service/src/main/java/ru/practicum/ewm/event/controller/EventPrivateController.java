@@ -3,6 +3,7 @@ package ru.practicum.ewm.event.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.AccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
@@ -10,8 +11,12 @@ import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.EventPrivateService;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.request.dto.ParticipationRequestDto;
+import ru.practicum.ewm.request.service.RequestPrivateService;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -19,6 +24,8 @@ import java.util.List;
 public class EventPrivateController {
     @Autowired
     private EventPrivateService eventPrivateService;
+    @Autowired
+    private RequestPrivateService requestPrivateService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,6 +58,16 @@ public class EventPrivateController {
         return eventPrivateService.updateUserEvent(userId, eventId, request);
     }
 
-//    todo privatePatchRequest
-//    todo privateGetRequests
+    @PatchMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    Map<String, List<ParticipationRequestDto>> acceptRequest(@PathVariable long userId, @PathVariable long eventId,
+            @RequestBody @Valid EventRequestStatusUpdateRequest request) throws AccessException {
+        return requestPrivateService.acceptRequest(userId, eventId, request);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    List<ParticipationRequestDto> getEventRequests(@PathVariable long userId, @PathVariable long eventId) {
+        return requestPrivateService.getEventRequests(userId, eventId);
+    }
 }
