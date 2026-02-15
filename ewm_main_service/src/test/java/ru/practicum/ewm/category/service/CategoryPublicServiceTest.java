@@ -13,15 +13,13 @@ import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.exception.notFound.CategoryNotFound;
-import ru.practicum.ewm.exception.notFound.EventNotFound;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryPublicServiceTest {
@@ -35,9 +33,7 @@ public class CategoryPublicServiceTest {
 
     @Test
     void getAllCategoriesByPagesTest() {
-        List<Category> list = List.of(Category.builder().id(1).name("name 1").build(),
-                Category.builder().id(2).name("name 2").build(),
-                Category.builder().id(3).name("name 3").build());
+        List<Category> list = List.of(Category.builder().id(1).name("name 1").build(), Category.builder().id(2).name("name 2").build(), Category.builder().id(3).name("name 3").build());
 
         Pageable pageable = PageRequest.of(0 / 10, 10, Sort.by("id").ascending());
 
@@ -74,7 +70,6 @@ public class CategoryPublicServiceTest {
 
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(CategoryNotFound.class,
-                () -> service.getCategory(1));
+        assertThrows(CategoryNotFound.class, () -> service.getCategory(1));
     }
 }

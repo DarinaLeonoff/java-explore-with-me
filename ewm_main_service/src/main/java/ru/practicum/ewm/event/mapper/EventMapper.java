@@ -25,7 +25,7 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdOn", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "state", expression = "java(EventState.PENDING)")
-    @Mapping(target = "views", expression = "java(0)")
+    @Mapping(target = "views", expression = "java(0L)")
     Event mapNewEventToEvent(NewEventDto eventDto, CategoryDto dto, UserDto userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

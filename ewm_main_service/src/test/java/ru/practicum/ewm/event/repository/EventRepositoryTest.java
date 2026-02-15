@@ -49,10 +49,10 @@ public class EventRepositoryTest {
 
         initiator = em.persist(User.builder().name("User for test").email("name@ya.ru").build());
 
-        availablePaidEvent = em.persist(Event.builder().createdOn(LocalDateTime.now()).initiator(initiator).title("Rock Concert").annotation("Great music concert").description("Big open air rock concert in the city center").eventDate(LocalDateTime.now().plusDays(10)).category(music).paid(true).participantLimit(100).confirmedRequests(10).requestModeration(true).state(EventState.PUBLISHED).location(new Location(55.75, 37.61)).views(0).build());
+        availablePaidEvent = em.persist(Event.builder().createdOn(LocalDateTime.now()).initiator(initiator).title("Rock Concert").annotation("Great music concert").description("Big open air rock concert in the city center").eventDate(LocalDateTime.now().plusDays(10)).category(music).paid(true).participantLimit(100).confirmedRequests(10).requestModeration(true).state(EventState.PUBLISHED).location(new Location(55.75, 37.61)).views(0L).build());
 
         unavailableFreeEvent = em.persist(Event.builder().createdOn(LocalDateTime.now()).initiator(initiator).title("Local Football Match").annotation("Sport event").description("Football championship match").eventDate(LocalDateTime.now().plusDays(5)).category(sport).paid(false).participantLimit(10).confirmedRequests(10)
-                .requestModeration(false).state(EventState.PUBLISHED).location(new Location(59.93, 30.31)).views(0).build());
+                .requestModeration(false).state(EventState.PUBLISHED).location(new Location(59.93, 30.31)).views(0L).build());
 
         em.flush();
         em.clear();

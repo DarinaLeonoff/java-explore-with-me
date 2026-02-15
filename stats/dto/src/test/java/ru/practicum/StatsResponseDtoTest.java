@@ -15,7 +15,7 @@ public class StatsResponseDtoTest {
     private final ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 
     String jsonString = "{\n" + "   \"app\":\"ewm-main-server\",\n" + "   \"uri\":\"/stats\",\n" + "   \"hits\":0\n" + "}";
-    StatsResponseDto dto = StatsResponseDto.builder().app("ewm-main-server").uri("/stats").hits(0).build();
+    StatsResponseDto dto = StatsResponseDto.builder().app("ewm-main-server").uri("/stats").hits(0L).build();
 
     @Test
     void testSerialization() throws IOException {

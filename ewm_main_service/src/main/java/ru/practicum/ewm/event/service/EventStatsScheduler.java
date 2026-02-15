@@ -44,15 +44,15 @@ public class EventStatsScheduler {
 
         List<StatsResponseDto> stats = client.getStats(start, end, uris, true);
 
-        Map<String, Integer> viewsMap = stats.stream()
+        Map<String, Long> viewsMap = stats.stream()
                 .collect(Collectors.toMap(
                         StatsResponseDto::getUri,
                         StatsResponseDto::getHits
                 ));
 
         events.forEach(event -> {
-            Integer views = viewsMap.getOrDefault(
-                    Constants.getEventUri(event.getId()), 0
+            Long views = viewsMap.getOrDefault(
+                    Constants.getEventUri(event.getId()), 0L
             );
             event.setViews(views);
         });

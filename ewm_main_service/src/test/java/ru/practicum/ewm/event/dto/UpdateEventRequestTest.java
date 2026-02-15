@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UpdateEventRequestTest {
     private static Validator validator;
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());;
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @BeforeAll
     static void setup() {
@@ -44,8 +44,7 @@ public class UpdateEventRequestTest {
     void shouldPassValidation_whenValidRequest() {
         UpdateEventRequest request = createValidRequest();
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertTrue(violations.isEmpty());
     }
@@ -55,8 +54,7 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = createValidRequest();
         request.setAnnotation("short");
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertFalse(violations.isEmpty());
     }
@@ -66,8 +64,7 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = createValidRequest();
         request.setDescription("short");
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertFalse(violations.isEmpty());
     }
@@ -77,8 +74,7 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = createValidRequest();
         request.setTitle("ab");
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertFalse(violations.isEmpty());
     }
@@ -88,8 +84,7 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = new UpdateEventRequest();
 
         // DTO для обновления → допускаем null
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertTrue(violations.isEmpty());
     }
@@ -99,8 +94,7 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = createValidRequest();
         request.setAnnotation("a".repeat(2001));
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertFalse(violations.isEmpty());
     }
@@ -110,22 +104,18 @@ public class UpdateEventRequestTest {
         UpdateEventRequest request = createValidRequest();
         request.setDescription("a".repeat(7001));
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertFalse(violations.isEmpty());
     }
 
     @Test
     void shouldDeserializeEventDate() throws Exception {
-        String json = """
-                {
-                  "eventDate": "2025-12-01 10:15:30"
-                }
-                """;
+        String json = "{\n" +
+                  "\"eventDate\":\"2025-12-01 10:15:30\"\n" +
+                "}";
 
-        UpdateEventRequest request =
-                mapper.readValue(json, UpdateEventRequest.class);
+        UpdateEventRequest request = mapper.readValue(json, UpdateEventRequest.class);
 
         assertNotNull(request.getEventDate());
     }

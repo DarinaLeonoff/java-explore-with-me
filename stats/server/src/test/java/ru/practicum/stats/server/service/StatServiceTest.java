@@ -137,7 +137,7 @@ public class StatServiceTest {
         StatsResponseDto e = new StatsResponseDto();
         e.setApp(app);
         e.setUri(uri);
-        e.setHits(1);
+        e.setHits(1L);
         return e;
     }
 

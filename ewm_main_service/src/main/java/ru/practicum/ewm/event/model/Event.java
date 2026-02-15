@@ -73,5 +73,5 @@ public class Event {
     private Location location;
 
     @Column(name = "views")
-    private int views;
+    private Long views;
 }

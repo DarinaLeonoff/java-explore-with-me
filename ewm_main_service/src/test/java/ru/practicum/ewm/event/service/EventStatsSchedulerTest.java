@@ -6,10 +6,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.ewm.constants.Constants;
 import ru.practicum.ewm.event.model.Event;
@@ -45,15 +43,13 @@ public class EventStatsSchedulerTest {
 
         Page<Event> page = new PageImpl<>(List.of(event));
 
-        when(eventRepository.findByState(eq(EventState.PUBLISHED), any()))
-                .thenReturn(page);
+        when(eventRepository.findByState(eq(EventState.PUBLISHED), any())).thenReturn(page);
 
         StatsResponseDto stat = new StatsResponseDto();
         stat.setUri(Constants.getEventUri(1L));
-        stat.setHits(50);
+        stat.setHits(50L);
 
-        when(client.getStats(any(), any(), any(), eq(true)))
-                .thenReturn(List.of(stat));
+        when(client.getStats(any(), any(), any(), eq(true))).thenReturn(List.of(stat));
 
         scheduler.updateViews();
 
@@ -64,8 +60,7 @@ public class EventStatsSchedulerTest {
 
     @Test
     void shouldNotCallClientWhenNoEvents() {
-        when(eventRepository.findByState(eq(EventState.PUBLISHED), any()))
-                .thenReturn(Page.empty());
+        when(eventRepository.findByState(eq(EventState.PUBLISHED), any())).thenReturn(Page.empty());
 
         scheduler.updateViews();
 
@@ -81,11 +76,9 @@ public class EventStatsSchedulerTest {
 
         Page<Event> page = new PageImpl<>(List.of(event));
 
-        when(eventRepository.findByState(eq(EventState.PUBLISHED), any()))
-                .thenReturn(page);
+        when(eventRepository.findByState(eq(EventState.PUBLISHED), any())).thenReturn(page);
 
-        when(client.getStats(any(), any(), any(), eq(true)))
-                .thenReturn(List.of());
+        when(client.getStats(any(), any(), any(), eq(true))).thenReturn(List.of());
 
         scheduler.updateViews();
 
@@ -101,17 +94,13 @@ public class EventStatsSchedulerTest {
 
         Page<Event> page = new PageImpl<>(List.of(event));
 
-        when(eventRepository.findByState(eq(EventState.PUBLISHED), any()))
-                .thenReturn(page);
+        when(eventRepository.findByState(eq(EventState.PUBLISHED), any())).thenReturn(page);
 
-        ArgumentCaptor<LocalDateTime> startCaptor =
-                ArgumentCaptor.forClass(LocalDateTime.class);
+        ArgumentCaptor<LocalDateTime> startCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
 
-        ArgumentCaptor<LocalDateTime> endCaptor =
-                ArgumentCaptor.forClass(LocalDateTime.class);
+        ArgumentCaptor<LocalDateTime> endCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
 
-        when(client.getStats(startCaptor.capture(), endCaptor.capture(), anyList(), eq(true)))
-                .thenReturn(List.of());
+        when(client.getStats(startCaptor.capture(), endCaptor.capture(), anyList(), eq(true))).thenReturn(List.of());
 
         scheduler.updateViews();
 
@@ -125,21 +114,15 @@ public class EventStatsSchedulerTest {
         event.setId(10L);
         event.setPublishedOn(LocalDateTime.now());
 
-        when(eventRepository.findByState(any(), any()))
-                .thenReturn(new PageImpl<>(List.of(event)));
+        when(eventRepository.findByState(any(), any())).thenReturn(new PageImpl<>(List.of(event)));
 
-        ArgumentCaptor<List<String>> uriCaptor =
-                ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<String>> uriCaptor = ArgumentCaptor.forClass(List.class);
 
-        when(client.getStats(any(), any(), uriCaptor.capture(), eq(true)))
-                .thenReturn(List.of());
+        when(client.getStats(any(), any(), uriCaptor.capture(), eq(true))).thenReturn(List.of());
 
         scheduler.updateViews();
 
-        assertEquals(
-                List.of(Constants.getEventUri(10L)),
-                uriCaptor.getValue()
-        );
+        assertEquals(List.of(Constants.getEventUri(10L)), uriCaptor.getValue());
     }
 
 

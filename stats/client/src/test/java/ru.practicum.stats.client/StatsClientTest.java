@@ -74,7 +74,7 @@ public class StatsClientTest {
         List<String> uris = List.of("/events/2", "/events/1", "/events/3");
         boolean unique = false;
 
-        List<StatsResponseDto> responseList = List.of(StatsResponseDto.builder().app("ewm-main-server").uri("/events/1").hits(10).build());
+        List<StatsResponseDto> responseList = List.of(StatsResponseDto.builder().app("ewm-main-server").uri("/events/1").hits(10L).build());
 
         ResponseEntity<List<StatsResponseDto>> responseEntity = new ResponseEntity<>(responseList, HttpStatus.OK);
 

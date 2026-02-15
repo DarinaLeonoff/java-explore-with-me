@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AdminUpdatesTest {
     private static Validator validator;
+
     @BeforeAll
     static void setup() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -26,8 +27,7 @@ public class AdminUpdatesTest {
     void shouldPassValidation_whenPublishRequest() {
         UpdateEventAdminRequest request = UpdateEventAdminRequest.builder().stateAction(StateAdminAction.PUBLISH_EVENT).build();
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertTrue(violations.isEmpty());
     }
@@ -36,8 +36,7 @@ public class AdminUpdatesTest {
     void shouldPassValidation_whenRejectRequest() {
         UpdateEventAdminRequest request = UpdateEventAdminRequest.builder().stateAction(StateAdminAction.REJECT_EVENT).build();
 
-        Set<ConstraintViolation<UpdateEventRequest>> violations =
-                validator.validate(request);
+        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
 
         assertTrue(violations.isEmpty());
     }
