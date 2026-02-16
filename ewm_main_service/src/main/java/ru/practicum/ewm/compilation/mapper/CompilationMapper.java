@@ -16,14 +16,11 @@ public interface CompilationMapper {
     CompilationDto mapEntityToDto(Compilation compilation);
 
     default Compilation updateCompilation(Compilation old, UpdateCompilationDto dto) {
-        if (dto.getTitle() != null && !dto.getTitle().equals(old.getTitle())) {
+        if (dto.getTitle() != null) {
             old.setTitle(dto.getTitle());
         }
-        if (dto.getPinned() != null && !dto.getPinned() == old.isPinned()) {
-            old.setTitle(dto.getTitle());
-        }
-        if (dto.getEvents() != null) {
-            old.setTitle(dto.getTitle());
+        if (dto.getPinned() != null) {
+            old.setPinned(dto.getPinned());
         }
         return old;
     }
