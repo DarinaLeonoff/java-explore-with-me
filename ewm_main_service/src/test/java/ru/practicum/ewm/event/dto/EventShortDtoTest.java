@@ -21,7 +21,7 @@ public class EventShortDtoTest {
 
     @Test
     void shouldSerializeEventShortDto() throws Exception {
-        EventShortDto dto = EventShortDto.builder().annotation("annot").category(CategoryDto.builder().id(1).name("cat").build()).confirmedRequests(1).eventDate(LocalDateTime.now().plusDays(2)).id(2L).initiator(UserShortDto.builder().id(1L).name("Name").build()).paid(false).title("Title").views(20).build();
+        EventShortDto dto = EventShortDto.builder().annotation("annot").category(CategoryDto.builder().id(1).name("cat").build()).confirmedRequests(1).eventDate(LocalDateTime.now().plusDays(2)).id(2L).initiator(UserShortDto.builder().id(1L).name("Name").build()).paid(false).title("Title").views(20L).build();
 
         JsonContent<EventShortDto> json = jacksonTester.write(dto);
 

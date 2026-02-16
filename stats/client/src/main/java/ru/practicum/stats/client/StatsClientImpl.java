@@ -38,14 +38,17 @@ public class StatsClientImpl implements StatsClient {
     @Override
     public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         log.info("Getting stats");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(statsServiceUrl + "/stats").queryParam("start", start.format(formatter)).queryParam("end", end.format(formatter)).queryParam("unique", unique);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(statsServiceUrl + "/stats")
+                .queryParam("start", start)
+                .queryParam("end", end)
+                .queryParam("unique", unique);
 
         uris.forEach(uri -> builder.queryParam("uris", uri));
 
         ResponseEntity<List<StatsResponseDto>> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {
         });
-        log.info("Stats was successful extract");
+        log.info("Stats was successful extract. response body is null = {}", response.getBody() == null);
         return response.getBody();
     }
 }

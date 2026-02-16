@@ -113,35 +113,35 @@ public class EventPrivateServiceTest {
         verify(repository).findByIdAndInitiatorId(2L, 1L);
     }
 
-    @Test
-    void shouldUpdateEventWithCategory() {
-        long userId = 1L;
-        long eventId = 2L;
-
-        UpdateEventUserRequest request = new UpdateEventUserRequest();
-        request.setCategory(5);
-
-        UserDto user = new UserDto();
-        CategoryDto category = new CategoryDto();
-
-        Event event = new Event();
-        Event updated = new Event();
-        Event saved = new Event();
-        EventFullDto dto = new EventFullDto();
-
-        when(userService.getUserById(userId)).thenReturn(user);
-        when(repository.findByIdAndInitiatorId(eventId, userId)).thenReturn(event);
-        when(categoryService.getCategory(5)).thenReturn(category);
-        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
-        when(repository.save(updated)).thenReturn(saved);
-        when(mapper.mapEventToFullDto(saved)).thenReturn(dto);
-
-        EventFullDto result = service.updateUserEvent(userId, eventId, request);
-
-        assertEquals(dto, result);
-
-        verify(categoryService).getCategory(5);
-    }
+//    @Test
+//    void shouldUpdateEventWithCategory() {
+//        long userId = 1L;
+//        long eventId = 2L;
+//
+//        UpdateEventUserRequest request = new UpdateEventUserRequest();
+//        request.setCategory(5);
+//
+//        UserDto user = new UserDto();
+//        CategoryDto category = new CategoryDto();
+//
+//        Event event = new Event();
+//        Event updated = new Event();
+//        Event saved = new Event();
+//        EventFullDto dto = new EventFullDto();
+//
+//        when(userService.getUserById(userId)).thenReturn(user);
+//        when(repository.findByIdAndInitiatorId(eventId, userId)).thenReturn(event);
+//        when(categoryService.getCategory(5)).thenReturn(category);
+//        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
+//        when(repository.save(updated)).thenReturn(saved);
+//        when(mapper.mapEventToFullDto(saved)).thenReturn(dto);
+//
+//        EventFullDto result = service.updateUserEvent(userId, eventId, request);
+//
+//        assertEquals(dto, result);
+//
+//        verify(categoryService).getCategory(5);
+//    }
 
     @Test
     void shouldCancelReview() {

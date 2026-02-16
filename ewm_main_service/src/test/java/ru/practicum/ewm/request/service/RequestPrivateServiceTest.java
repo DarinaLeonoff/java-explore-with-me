@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.expression.AccessException;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.AccessRightsException;
@@ -160,22 +161,22 @@ public class RequestPrivateServiceTest {
     }
 
     @Test
-    void shouldAcceptRequests() throws Exception {
-        long userId = 1L;
-        long eventId = 2L;
+    void shouldAcceptRequests() throws AccessException {
+
+        User initiator = new User();
+        initiator.setId(1L);
 
         Event event = new Event();
-        User initiator = new User();
-        initiator.setId(userId);
         event.setInitiator(initiator);
 
-        when(eventRepository.findById(eventId))
+        when(eventRepository.findById(2L))
                 .thenReturn(Optional.of(event));
 
         Request req = new Request();
         req.setId(10L);
+        req.setStatus(RequestState.PENDING);
 
-        when(requestRepository.findAllByEventId(eventId))
+        when(requestRepository.findAllById(any()))
                 .thenReturn(List.of(req));
 
         ParticipationRequestDto dto = new ParticipationRequestDto();
@@ -187,17 +188,22 @@ public class RequestPrivateServiceTest {
         request.setStatus(RequestState.CONFIRMED);
 
         Map<String, List<ParticipationRequestDto>> result =
-                service.acceptRequest(userId, eventId, request);
+                service.acceptRequest(1L, 2L, request);
 
         assertEquals(RequestState.CONFIRMED, req.getStatus());
         assertTrue(result.containsKey("confirmedRequests"));
+
+        verify(requestRepository).saveAll(any());
+        verify(eventRepository).save(any());
     }
 
     @Test
-    void shouldRejectRequests() throws Exception {
-        Event event = new Event();
+    void shouldRejectRequests() throws AccessException {
+
         User initiator = new User();
         initiator.setId(1L);
+
+        Event event = new Event();
         event.setInitiator(initiator);
 
         when(eventRepository.findById(2L))
@@ -205,8 +211,9 @@ public class RequestPrivateServiceTest {
 
         Request req = new Request();
         req.setId(5L);
+        req.setStatus(RequestState.PENDING);
 
-        when(requestRepository.findAllByEventId(2L))
+        when(requestRepository.findAllById(any()))
                 .thenReturn(List.of(req));
 
         when(mapper.mapRequestToDto(req))
@@ -220,6 +227,7 @@ public class RequestPrivateServiceTest {
         Map<String, List<ParticipationRequestDto>> result =
                 service.acceptRequest(1L, 2L, request);
 
+        assertEquals(RequestState.REJECTED, req.getStatus());
         assertTrue(result.containsKey("rejectedRequests"));
     }
 

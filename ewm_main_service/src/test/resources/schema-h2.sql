@@ -1,31 +1,14 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    id
-    BIGINT
-    AUTO_INCREMENT
-    PRIMARY
-    KEY,
-    name
-    VARCHAR
-(
-    254
-) NOT NULL,
-    email VARCHAR
-(
-    250
-) NOT NULL UNIQUE
+    id    BIGINT    AUTO_INCREMENT    PRIMARY    KEY,
+    name    VARCHAR(250) NOT NULL,
+    email VARCHAR(254) NOT NULL UNIQUE
     );
 
 CREATE TABLE IF NOT EXISTS categories
 (
-    id
-    INTEGER
-    AUTO_INCREMENT
-    PRIMARY
-    KEY,
-    name
-    VARCHAR
-(
+    id    INTEGER    AUTO_INCREMENT    PRIMARY    KEY,
+    name    VARCHAR(
     50
 ) NOT NULL UNIQUE,
     is_system BOOLEAN DEFAULT FALSE

@@ -25,7 +25,7 @@ public class EventFullDtoTest {
         LocalDateTime eventDate = LocalDateTime.of(2026, 3, 10, 18, 30);
         LocalDateTime publishedOn = LocalDateTime.of(2026, 2, 5, 12, 0);
 
-        EventFullDto dto = EventFullDto.builder().id(1L).annotation("annotation").category(CategoryDto.builder().id(10).name("category").build()).confirmedRequests(5).createdOn(createdOn).description("description").eventDate(eventDate).initiator(UserShortDto.builder().id(2L).name("initiator").build()).location(new Location(55.75, 37.61)).paid(true).participantLimit(100).publishedOn(publishedOn).requestModeration(true).state(EventState.PUBLISHED).title("title").views(42).build();
+        EventFullDto dto = EventFullDto.builder().id(1L).annotation("annotation").category(CategoryDto.builder().id(10).name("category").build()).confirmedRequests(5).createdOn(createdOn).description("description").eventDate(eventDate).initiator(UserShortDto.builder().id(2L).name("initiator").build()).location(new Location(55.75, 37.61)).paid(true).participantLimit(100).publishedOn(publishedOn).requestModeration(true).state(EventState.PUBLISHED).title("title").views(42L).build();
 
         JsonContent<EventFullDto> json = tester.write(dto);
 

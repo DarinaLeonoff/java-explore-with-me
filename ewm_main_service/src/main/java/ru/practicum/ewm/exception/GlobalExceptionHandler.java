@@ -32,25 +32,13 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ErrorResponse handleConstraintViolation(ConstraintViolationException e) {
 
-        String[] errors = e.getConstraintViolations().stream()
-                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
-                .toArray(String[]::new);
+        String[] errors = e.getConstraintViolations().stream().map(v -> v.getPropertyPath() + ": " + v.getMessage()).toArray(String[]::new);
 
         ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
 
-        String message = String.format(
-                "Field: %s. Error: %s. Value: %s",
-                violation.getPropertyPath(),
-                violation.getMessage(),
-                violation.getInvalidValue()
-        );
+        String message = String.format("Field: %s. Error: %s. Value: %s", violation.getPropertyPath(), violation.getMessage(), violation.getInvalidValue());
 
-        return new ErrorResponse(
-                errors,
-                HttpStatus.BAD_REQUEST.name(),
-                "Incorrectly made request.",
-                message
-        );
+        return new ErrorResponse(errors, HttpStatus.BAD_REQUEST.name(), "Incorrectly made request.", message);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -72,4 +60,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(null, HttpStatus.BAD_REQUEST.name(), "User don't have rights for action.", e.getMessage());
     }
 
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalState(ConflictException e) {
+        return new ErrorResponse(null, HttpStatus.BAD_REQUEST.name(), "Illegal action.", e.getMessage());
+    }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ public class EventSpecification {
         return (root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get("state"), EventState.PUBLISHED));
 
             //filter by text
             if (text != null && !text.isBlank()) {
@@ -50,7 +53,6 @@ public class EventSpecification {
                 predicates.add(cb.or(noLimit, hasSpots));
             }
 
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -66,6 +68,10 @@ public class EventSpecification {
             }
 
             //filter by states
+//            if (states != null && !states.isEmpty()) {
+//                predicates.add(root.get("state").in(states));
+//            }
+
             if (states == null || states.isEmpty()) {
                 return null;
             }

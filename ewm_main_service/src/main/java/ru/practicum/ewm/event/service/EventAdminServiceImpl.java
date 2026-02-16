@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -7,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.category.dto.CategoryDto;
+import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.category.service.CategoryPublicService;
 import ru.practicum.ewm.constants.Constants;
 import ru.practicum.ewm.event.dto.EventFullDto;
@@ -18,11 +20,13 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.repository.EventSpecification;
+import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EventAdminServiceImpl implements EventAdminService {
 
@@ -31,6 +35,8 @@ public class EventAdminServiceImpl implements EventAdminService {
 
     @Autowired
     private EventRepository repository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private EventMapper mapper;
@@ -49,13 +55,16 @@ public class EventAdminServiceImpl implements EventAdminService {
     @Override
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest request) {
         Event event = repository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
-        CategoryDto category = request.getCategory() == null ? null : categoryService.getCategory(request.getCategory());
+        Category category = request.getCategory() == null ? null : categoryRepository.findById(request.getCategory()).orElseThrow(() -> new CategoryNotFound(request.getCategory()));
         Event updated = mapper.updateEvent(event, request, category);
         if (request.getStateAction() == StateAdminAction.PUBLISH_EVENT) {
             updated.setState(EventState.PUBLISHED);
+            updated.setPublishedOn(LocalDateTime.now());
         } else if (request.getStateAction() == StateAdminAction.REJECT_EVENT) {
             updated.setState(EventState.CANCELED);
         }
+        repository.save(updated);
+        repository.flush();
         return mapper.mapEventToFullDto(updated);
     }
 }

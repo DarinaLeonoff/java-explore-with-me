@@ -37,7 +37,7 @@ public class EventPublicControllerTest {
 
     @Test
     void shouldReturnEventList() throws Exception {
-        EventShortDto dto = EventShortDto.builder().id(1L).title("Title").annotation("Annotation").paid(false).views(10).confirmedRequests(2).build();
+        EventShortDto dto = EventShortDto.builder().id(1L).title("Title").annotation("Annotation").paid(false).views(10L).confirmedRequests(2).build();
 
         when(service.getEventList(any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt())).thenReturn(List.of(dto));
 
@@ -48,7 +48,7 @@ public class EventPublicControllerTest {
 
     @Test
     void shouldReturnEventById() throws Exception {
-        EventFullDto dto = EventFullDto.builder().id(1L).title("Full event").annotation("annotation").views(100).build();
+        EventFullDto dto = EventFullDto.builder().id(1L).title("Full event").annotation("annotation").views(100L).build();
 
         when(service.getEvent(anyLong(), any())).thenReturn(dto);
 

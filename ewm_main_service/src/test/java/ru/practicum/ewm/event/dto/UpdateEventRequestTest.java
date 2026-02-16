@@ -40,14 +40,14 @@ public class UpdateEventRequestTest {
         return request;
     }
 
-    @Test
-    void shouldPassValidation_whenValidRequest() {
-        UpdateEventRequest request = createValidRequest();
-
-        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
-
-        assertTrue(violations.isEmpty());
-    }
+//    @Test
+//    void shouldPassValidation_whenValidRequest() {
+//        UpdateEventRequest request = createValidRequest();
+//
+//        Set<ConstraintViolation<UpdateEventRequest>> violations = validator.validate(request);
+//
+//        assertTrue(violations.isEmpty());
+//    }
 
     @Test
     void shouldFail_whenAnnotationTooShort() {

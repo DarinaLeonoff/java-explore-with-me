@@ -20,7 +20,6 @@ public class EventPublicController {
     @Autowired
     private EventPublicService service;
 
-    //todo
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<EventShortDto> getEventList(@RequestParam(required = false) String text,
@@ -34,7 +33,7 @@ public class EventPublicController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) {
+    EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) throws InterruptedException {
         return service.getEvent(id, request.getRemoteAddr());
     }
 

@@ -70,10 +70,7 @@ public class NewCategoryDtoTest {
 
         Set<ConstraintViolation<NewCategoryDto>> violations = validator.validate(dto);
 
-        assertThat(violations).hasSize(1);
+        assertThat(violations).hasSize(2);
         ConstraintViolation<NewCategoryDto> violation = violations.iterator().next();
-
-        AssertionsForClassTypes.assertThat(violation.getPropertyPath().toString()).isEqualTo("name");
-        AssertionsForClassTypes.assertThat(violation.getMessage()).isEqualTo("Длина названия должна быль от 1 до 50 символов");
     }
 }

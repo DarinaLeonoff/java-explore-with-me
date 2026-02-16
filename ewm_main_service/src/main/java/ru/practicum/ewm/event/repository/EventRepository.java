@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 
+import java.util.Optional;
+
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
@@ -21,4 +23,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     Event findByIdAndInitiatorId(long eventId, long userId);
 
     Page<Event> findByState(EventState state, Pageable pageable);
+
+    Optional<Event> findByIdAndState(long id, EventState eventState);
 }

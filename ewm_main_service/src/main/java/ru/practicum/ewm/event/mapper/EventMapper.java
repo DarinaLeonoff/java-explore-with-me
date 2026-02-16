@@ -3,6 +3,7 @@ package ru.practicum.ewm.event.mapper;
 import org.mapstruct.*;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
+import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
@@ -28,9 +29,61 @@ public interface EventMapper {
     @Mapping(target = "views", expression = "java(0L)")
     Event mapNewEventToEvent(NewEventDto eventDto, CategoryDto dto, UserDto userDto);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "category", source = "category", ignore = true)
-    Event updateEvent(@MappingTarget Event oldEvent, UpdateEventRequest updates, CategoryDto category);
+    default Event updateEvent(Event oldEvent,
+            UpdateEventRequest updates,
+            Category category) {
+
+        if (updates == null) {
+            return oldEvent;
+        }
+
+        // annotation
+        if (updates.getAnnotation() != null) {
+            oldEvent.setAnnotation(updates.getAnnotation());
+        }
+
+        // description
+        if (updates.getDescription() != null) {
+            oldEvent.setDescription(updates.getDescription());
+        }
+
+        // title
+        if (updates.getTitle() != null) {
+            oldEvent.setTitle(updates.getTitle());
+        }
+
+        // eventDate
+        if (updates.getEventDate() != null) {
+            oldEvent.setEventDate(updates.getEventDate());
+        }
+
+        // category
+        if (category != null) {
+            oldEvent.setCategory(category);
+        }
+
+        // location
+        if (updates.getLocation() != null) {
+            oldEvent.setLocation(updates.getLocation());
+        }
+
+        // paid
+        if (updates.getPaid() != null) {
+            oldEvent.setPaid(updates.getPaid());
+        }
+
+        // participant limit
+        if (updates.getParticipantLimit() != null) {
+            oldEvent.setParticipantLimit(updates.getParticipantLimit());
+        }
+
+        // request moderation
+        if (updates.getRequestModeration() != null) {
+            oldEvent.setRequestModeration(updates.getRequestModeration());
+        }
+
+        return oldEvent;
+    }
+
 
 }
