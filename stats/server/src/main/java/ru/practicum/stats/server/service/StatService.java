@@ -2,7 +2,9 @@ package ru.practicum.stats.server.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
 import ru.practicum.stats.server.mapper.StatMapper;
@@ -27,11 +29,14 @@ public class StatService {
     }
 
     public List<StatsResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (start.isAfter(end)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must be before end date");
+        }
+
         List<String> safeUris = (uris == null || uris.isEmpty()) ? null : uris;
 
-
         List<StatsResponseDto> result = Boolean.TRUE.equals(unique) ? repository.findStatsUnique(start, end, safeUris) : repository.findStats(start, end, safeUris);
-
+        log.info("result is empty = {}", result.isEmpty());
         return result;
     }
 }

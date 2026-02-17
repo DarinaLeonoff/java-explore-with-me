@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.AccessException;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.AccessRightsException;
 import ru.practicum.ewm.exception.ConflictException;
@@ -37,21 +38,64 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
 
     @Override
     public ParticipationRequestDto makeRequest(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFound(userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFound(eventId));
 
-        LocalDateTime created = LocalDateTime.now();
-        RequestState state;
-        if (event.getParticipantLimit() == 0) {
-            state = RequestState.CONFIRMED;
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventRepository.save(event);
-        } else {
-            state = RequestState.PENDING;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFound(userId));
+
+        // инициатор не может отправлять заявки
+        if (event.getInitiator().getId().equals(userId)) {
+            throw new ConflictException("Initiator can not make request");
         }
 
-        Request newRequest = Request.builder().user(user).event(event).status(state).created(created).build();
-        return mapper.mapRequestToDto(requestRepository.save(newRequest));
+        // событие должно быть опубликовано
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new ConflictException("Event is not published");
+        }
+
+        // запрет дубликатов
+        if (requestRepository.existsByUserIdAndEventId(userId, eventId)) {
+            throw new ConflictException("Duplicate request");
+        }
+
+        long confirmedCount = event.getConfirmedRequests();
+
+        RequestState status;
+
+        // если нет лимита
+        if (event.getParticipantLimit() == 0) {
+            status = RequestState.CONFIRMED;
+
+            // если модерация выключена
+        } else if (!event.isRequestModeration()) {
+
+            if (confirmedCount >= event.getParticipantLimit()) {
+                throw new ConflictException("Limit reached");
+            }
+
+            status = RequestState.CONFIRMED;
+
+            // иначе PENDING
+        } else {
+            status = RequestState.PENDING;
+        }
+
+        Request request = Request.builder()
+                .user(user)
+                .event(event)
+                .status(status)
+                .created(LocalDateTime.now())
+                .build();
+
+        requestRepository.save(request);
+
+        if (status == RequestState.CONFIRMED) {
+            event.setConfirmedRequests((int)confirmedCount + 1);
+            eventRepository.save(event);
+        }
+
+        return mapper.mapRequestToDto(request);
     }
 
     @Override
@@ -90,17 +134,17 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
 
         for (Request r : requests) {
 
-            if (r.getStatus() != RequestState.PENDING) {
-                throw new ConflictException("Request already processed.");
-            }
-
             if (request.getStatus() == RequestState.CONFIRMED) {
 
-                if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+                if (r.getStatus() == RequestState.REJECTED) {
+                    throw new ConflictException("Rejected requests can not be confirmed");
+                }
 
-                    r.setStatus(RequestState.REJECTED);
-                    rejected.add(r);
-                    continue;
+                if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+                    throw new ConflictException("Can not accept. Limit of confirmed participation is reached");
+//                    r.setStatus(RequestState.REJECTED);
+//                    rejected.add(r);
+//                    continue;
                 }
 
                 r.setStatus(RequestState.CONFIRMED);
@@ -109,6 +153,9 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1);
 
             } else {
+                if (r.getStatus() == RequestState.CONFIRMED) {
+                    throw new ConflictException("Confirmed requests can not be rejected");
+                }
                 r.setStatus(RequestState.REJECTED);
                 rejected.add(r);
             }

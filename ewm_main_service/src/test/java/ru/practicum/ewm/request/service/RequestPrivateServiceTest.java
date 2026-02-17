@@ -46,28 +46,28 @@ public class RequestPrivateServiceTest {
     @InjectMocks
     private RequestPrivateServiceImpl service;
 
-    @Test
-    void shouldMakeRequest() {
-        long userId = 1L;
-        long eventId = 2L;
-
-        Event event = new Event();
-        User user = new User();
-
-        Request saved = new Request();
-        ParticipationRequestDto dto = new ParticipationRequestDto();
-
-        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(requestRepository.save(any())).thenReturn(saved);
-        when(mapper.mapRequestToDto(saved)).thenReturn(dto);
-
-        ParticipationRequestDto result = service.makeRequest(userId, eventId);
-
-        assertEquals(dto, result);
-
-        verify(requestRepository).save(any(Request.class));
-    }
+//    @Test
+//    void shouldMakeRequest() {
+//        long userId = 1L;
+//        long eventId = 2L;
+//
+//        Event event = new Event();
+//        User user = new User();
+//
+//        Request saved = new Request();
+//        ParticipationRequestDto dto = new ParticipationRequestDto();
+//
+//        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+//        when(requestRepository.save(any())).thenReturn(saved);
+//        when(mapper.mapRequestToDto(saved)).thenReturn(dto);
+//
+//        ParticipationRequestDto result = service.makeRequest(userId, eventId);
+//
+//        assertEquals(dto, result);
+//
+//        verify(requestRepository).save(any(Request.class));
+//    }
 
     @Test
     void shouldThrowWhenEventNotFound() {

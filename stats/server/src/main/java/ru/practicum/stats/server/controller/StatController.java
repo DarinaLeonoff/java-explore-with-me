@@ -37,6 +37,8 @@ public class StatController {
                                            @RequestParam(required = false) List<String> uris,
                                            @RequestParam(required = false) Boolean unique) {
         log.info("Getting stat from {} to {}", start, end);
+        log.info("uris count is {}", uris.size());
+        log.info("unique is {}", unique);
         return service.getStats(start, end, uris, unique);
     }
 }

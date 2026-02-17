@@ -10,17 +10,12 @@ CREATE TABLE IF NOT EXISTS categories (
     is_system BOOLEAN DEFAULT FALSE
     );;
 
--- системная категория-заглушка
-INSERT INTO categories (name, is_system)
-VALUES ( 'Other', TRUE)
-ON CONFLICT (name) DO NOTHING;;
-
 CREATE TABLE IF NOT EXISTS events(
     id BIGSERIAL PRIMARY KEY,
     created_on TIMESTAMP WITHOUT TIME ZONE,
 
     initiator_id BIGINT NOT NULL,
-    category_id INTEGER NOT NULL DEFAULT 1,
+    category_id INTEGER NOT NULL,
 
     title VARCHAR(120) NOT NULL,
     annotation VARCHAR(2000) NOT NULL,
@@ -44,7 +39,7 @@ CREATE TABLE IF NOT EXISTS events(
 
     CONSTRAINT fk_event_initiator
     FOREIGN KEY (initiator_id)
-    REFERENCES users (id) ON DELETE CASCADE,
+    REFERENCES users (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_event_category
     FOREIGN KEY (category_id)

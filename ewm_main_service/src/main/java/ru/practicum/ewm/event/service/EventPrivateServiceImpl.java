@@ -19,6 +19,7 @@ import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.service.UserPublicService;
@@ -67,6 +68,9 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     public EventFullDto updateUserEvent(long userId, long eventId, UpdateEventUserRequest request) {
         UserDto user = userService.getUserById(userId);
         Event event = repository.findByIdAndInitiatorId(eventId, userId);
+        if (event.getState() == EventState.PUBLISHED) {
+            throw new ConflictException("Published events can not be updated by users");
+        }
         Category category;
         if (request.getCategory() != null) {
             category = categoryRepository.findById(request.getCategory()).orElseThrow(() -> new CategoryNotFound(request.getCategory()));

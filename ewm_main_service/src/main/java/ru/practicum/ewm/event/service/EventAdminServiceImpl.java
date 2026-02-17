@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
-import ru.practicum.ewm.category.service.CategoryPublicService;
 import ru.practicum.ewm.constants.Constants;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.updateDto.StateAdminAction;
@@ -20,6 +19,7 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.repository.EventSpecification;
+import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 
@@ -29,9 +29,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class EventAdminServiceImpl implements EventAdminService {
-
-    @Autowired
-    private CategoryPublicService categoryService;
 
     @Autowired
     private EventRepository repository;
@@ -57,11 +54,15 @@ public class EventAdminServiceImpl implements EventAdminService {
         Event event = repository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
         Category category = request.getCategory() == null ? null : categoryRepository.findById(request.getCategory()).orElseThrow(() -> new CategoryNotFound(request.getCategory()));
         Event updated = mapper.updateEvent(event, request, category);
-        if (request.getStateAction() == StateAdminAction.PUBLISH_EVENT) {
-            updated.setState(EventState.PUBLISHED);
-            updated.setPublishedOn(LocalDateTime.now());
-        } else if (request.getStateAction() == StateAdminAction.REJECT_EVENT) {
-            updated.setState(EventState.CANCELED);
+        if (updated.getState() == EventState.PENDING) {
+            if (request.getStateAction() == StateAdminAction.PUBLISH_EVENT) {
+                updated.setState(EventState.PUBLISHED);
+                updated.setPublishedOn(LocalDateTime.now());
+            } else if (request.getStateAction() == StateAdminAction.REJECT_EVENT) {
+                updated.setState(EventState.CANCELED);
+            }
+        } else {
+            throw new ConflictException("Expected state pending, but was " + updated.getState());
         }
         repository.save(updated);
         repository.flush();

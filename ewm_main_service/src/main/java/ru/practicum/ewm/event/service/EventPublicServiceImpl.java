@@ -17,7 +17,7 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.repository.EventSpecification;
-import ru.practicum.ewm.exception.ConflictException;
+import ru.practicum.ewm.exception.IllegalStateException;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 import ru.practicum.stats.client.StatsClient;
 
@@ -37,14 +37,15 @@ public class EventPublicServiceImpl implements EventPublicService {
 
     @Override
     public List<EventShortDto> getEventList(String text, List<Integer> categories, Boolean paid, String rangeStart,
-            String rangeEnd, Boolean onlyAvailable, SortType sort, int from, int size) {
+            String rangeEnd, Boolean onlyAvailable, SortType sort, int from, int size, String ip) {
 
         LocalDateTime start = rangeStart == null ? null : LocalDateTime.parse(rangeStart, Constants.DATE_FORMATTER);
         LocalDateTime end = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, Constants.DATE_FORMATTER);
 
         if (start != null && end != null && start.isAfter(end)) {
-            throw new ConflictException("rangeStart must be before rangeEnd");
+            throw new IllegalStateException("rangeStart must be before rangeEnd");
         }
+        client.hit(Constants.APP, "/events", ip);
 
         Specification<Event> spec = EventSpecification.withPublicFilters(text, categories, paid, start, end, onlyAvailable);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(sort == SortType.VIEWS ? "views" : "eventDate").descending());

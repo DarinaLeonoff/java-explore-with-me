@@ -27,8 +27,9 @@ public class EventPublicController {
             @RequestParam(required = false) String rangeStart, @RequestParam(required = false) String rangeEnd,
             @RequestParam(defaultValue = "false") Boolean onlyAvailable, @RequestParam(required = false) SortType sort,
             @RequestParam(defaultValue = "0") @Min(value = 0) int from,
-            @RequestParam(defaultValue = "10") @Min(value = 1) int size) {
-        return service.getEventList(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+            @RequestParam(defaultValue = "10") @Min(value = 1) int size,
+            HttpServletRequest request) {
+        return service.getEventList(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr());
     }
 
     @GetMapping("/{id}")

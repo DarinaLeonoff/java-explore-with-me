@@ -56,13 +56,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessRightsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNotFound(AccessRightsException e) {
+    public ErrorResponse handleRightsException(AccessRightsException e) {
         return new ErrorResponse(null, HttpStatus.BAD_REQUEST.name(), "User don't have rights for action.", e.getMessage());
     }
 
-    @ExceptionHandler(ConflictException.class)
+    @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalState(ConflictException e) {
+    public ErrorResponse handleIllegalState(IllegalStateException e) {
         return new ErrorResponse(null, HttpStatus.BAD_REQUEST.name(), "Illegal action.", e.getMessage());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflict(ConflictException e) {
+        return new ErrorResponse(null, HttpStatus.CONFLICT.name(), "Action has conflict", e.getMessage());
     }
 }
