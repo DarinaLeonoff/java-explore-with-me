@@ -44,7 +44,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflict(DataIntegrityViolationException e) {
-
         return new ErrorResponse(null, HttpStatus.CONFLICT.name(), "Integrity constraint has been violated.", e.getMessage());
     }
 

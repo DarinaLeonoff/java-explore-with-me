@@ -115,6 +115,73 @@ public class CompilationAdminServiceTest {
     }
 
     @Test
+    void shouldUpdateCompilationWithEventsNull() {
+        long id = 1L;
+
+        UpdateCompilationDto dto = new UpdateCompilationDto();
+        dto.setEvents(null);
+
+        Compilation oldComp = new Compilation();
+        Compilation updated = new Compilation();
+        Compilation saved = new Compilation();
+        CompilationDto result = new CompilationDto();
+
+        when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
+        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
+        when(compilationRepository.save(updated)).thenReturn(saved);
+        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+
+        CompilationDto response = service.updateCompilation(id, dto);
+
+        assertEquals(result, response);
+    }
+
+    @Test
+    void shouldUpdateCompilationWithEventsEmpty() {
+        long id = 1L;
+
+        UpdateCompilationDto dto = new UpdateCompilationDto();
+        dto.setEvents(List.of());
+
+        Compilation oldComp = new Compilation();
+        Compilation updated = new Compilation();
+        Compilation saved = new Compilation();
+        CompilationDto result = new CompilationDto();
+
+        when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
+        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
+        when(compilationRepository.save(updated)).thenReturn(saved);
+        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+
+        CompilationDto response = service.updateCompilation(id, dto);
+
+        assertEquals(result, response);
+    }
+
+    @Test
+    void shouldUpdateCompilationWithEvents() {
+        long id = 1L;
+
+        UpdateCompilationDto dto = new UpdateCompilationDto();
+        dto.setEvents(List.of(1L, 2L));
+
+        Compilation oldComp = new Compilation();
+        Compilation updated = new Compilation();
+        Compilation saved = new Compilation();
+        CompilationDto result = new CompilationDto();
+
+        when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
+        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
+        when(compilationRepository.save(updated)).thenReturn(saved);
+        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+
+        CompilationDto response = service.updateCompilation(id, dto);
+
+        assertEquals(result, response);
+    }
+
+
+    @Test
     void shouldThrowWhenCompilationNotFound() {
         when(compilationRepository.findById(1L)).thenReturn(Optional.empty());
 

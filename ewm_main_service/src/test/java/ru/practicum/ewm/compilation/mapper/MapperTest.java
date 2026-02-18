@@ -68,4 +68,16 @@ public class MapperTest {
 
         assertEquals(dto.getTitle(), updated.getTitle());
     }
+
+    @Test
+    void updateTestPinned() {
+        UpdateCompilationDto dto = UpdateCompilationDto.builder().pinned(false).build();
+        Compilation updated = mapper.updateCompilation(compilation, dto);
+
+        assertEquals(compilation.getId(), updated.getId());
+        assertEquals(compilation.isPinned(), updated.isPinned());
+        assertEquals(compilation.getEvents(), updated.getEvents());
+
+        assertEquals(dto.getPinned(), updated.isPinned());
+    }
 }

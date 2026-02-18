@@ -12,6 +12,7 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.model.Location;
 import ru.practicum.ewm.event.service.EventPrivateService;
 import ru.practicum.ewm.exception.AccessRightsException;
 import ru.practicum.ewm.exception.GlobalExceptionHandler;
@@ -19,6 +20,7 @@ import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.request.model.RequestState;
 import ru.practicum.ewm.request.service.RequestPrivateService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -43,31 +45,31 @@ public class EventPrivateControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-//    @Test
-//    void shouldCreateEvent() throws Exception {
-//        NewEventDto dto = NewEventDto.builder()
-//                .annotation("Annotation text Annotation text Annotation text")
-//                .category(1)
-//                .description("Description Text Description Text")
-//                .eventDate(LocalDateTime.now())
-//                .location(new Location())
-//                .paid(true)
-//                .participantLimit(20)
-//                .requestModeration(true)
-//                .title("Title text").build();
-//
-//        EventFullDto result = new EventFullDto();
-//
-//        when(eventPrivateService.postNewEvent(any(), eq(1L)))
-//                .thenReturn(result);
-//
-//        mockMvc.perform(post("/users/1/events")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(dto)))
-//                .andExpect(status().isCreated());
-//
-//        verify(eventPrivateService).postNewEvent(any(), eq(1L));
-//    }
+    @Test
+    void shouldCreateEvent() throws Exception {
+        NewEventDto dto = NewEventDto.builder()
+                .annotation("Annotation text Annotation text Annotation text")
+                .category(1)
+                .description("Description Text Description Text")
+                .eventDate(LocalDateTime.now().plusDays(2))
+                .location(new Location())
+                .paid(true)
+                .participantLimit(20)
+                .requestModeration(true)
+                .title("Title text").build();
+
+        EventFullDto result = new EventFullDto();
+
+        when(eventPrivateService.postNewEvent(any(), eq(1L)))
+                .thenReturn(result);
+
+        mockMvc.perform(post("/users/1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
+
+        verify(eventPrivateService).postNewEvent(any(), eq(1L));
+    }
 
     @Test
     void shouldFailValidation() throws Exception {

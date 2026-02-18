@@ -68,13 +68,13 @@ public class EventSpecification {
             }
 
             //filter by states
-//            if (states != null && !states.isEmpty()) {
-//                predicates.add(root.get("state").in(states));
-//            }
-
-            if (states == null || states.isEmpty()) {
-                return null;
+            if (states != null && !states.isEmpty()) {
+                predicates.add(root.get("state").in(states));
             }
+
+//            if (states == null || states.isEmpty()) {
+//                return null;
+//            }
 
             //filter by categories
             addCategoryFilter(categories, root, predicates);

@@ -142,9 +142,6 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
 
                 if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
                     throw new ConflictException("Can not accept. Limit of confirmed participation is reached");
-//                    r.setStatus(RequestState.REJECTED);
-//                    rejected.add(r);
-//                    continue;
                 }
 
                 r.setStatus(RequestState.CONFIRMED);

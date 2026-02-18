@@ -48,7 +48,7 @@ public class StatsClientImpl implements StatsClient {
         ResponseEntity<List<StatsResponseDto>> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {
         });
-        log.info("Stats was successful extract. response body is null = {}", response.getBody() == null);
+        log.info("Stats was successful extract.");
         return response.getBody();
     }
 }
