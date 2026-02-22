@@ -25,7 +25,7 @@ public class CategoryAdminServiceTest {
     private CategoryMapper mapper;
 
     @InjectMocks
-    private CategoryAdminServiceImpl service;
+    private CategoryServiceImpl service;
 
     @Test
     void createCategoryTest() {
@@ -42,7 +42,7 @@ public class CategoryAdminServiceTest {
 
         when(mapper.mapCategoryToDto(category)).thenReturn(categoryDto);
 
-        CategoryDto dto = service.createCategory(newCat);
+        CategoryDto dto = service.adminCreateCategory(newCat);
 
         assertEquals("new cat", dto.getName());
     }
@@ -60,7 +60,7 @@ public class CategoryAdminServiceTest {
         dto.setId(category.getId());
         when(mapper.mapCategoryToDto(category)).thenReturn(dto);
 
-        CategoryDto updated = service.aditCategory(dto, 1);
+        CategoryDto updated = service.adminUpdateCategory(dto, 1);
 
         assertEquals("update Cat", updated.getName());
         assertEquals(1, updated.getId());
@@ -70,15 +70,14 @@ public class CategoryAdminServiceTest {
     void updateCategoryFallTest() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(CategoryNotFound.class,
-                () -> service.aditCategory(any(), 1));
+        assertThrows(CategoryNotFound.class, () -> service.adminUpdateCategory(any(), 1));
     }
 
     @Test
     void deleteCategoryTest() {
         Category category = Category.builder().id(1).name("cat").build();
         when(repository.findById(1)).thenReturn(Optional.ofNullable(category));
-        service.removeCategory(1);
+        service.adminRemoveCategory(1);
         verify(repository, times(1)).deleteById(anyInt());
     }
 
@@ -86,7 +85,6 @@ public class CategoryAdminServiceTest {
     void deleteeCategoryFallTest() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(CategoryNotFound.class,
-                () -> service.removeCategory(1));
+        assertThrows(CategoryNotFound.class, () -> service.adminRemoveCategory(1));
     }
 }

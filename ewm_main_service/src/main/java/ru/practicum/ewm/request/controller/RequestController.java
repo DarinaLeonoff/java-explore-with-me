@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.request.service.RequestPrivateService;
+import ru.practicum.ewm.request.service.RequestService;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping("/users/{userId}/requests")
 public class RequestController {
     @Autowired
-    private RequestPrivateService service;
+    private RequestService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

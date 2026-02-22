@@ -10,11 +10,4 @@ public interface CategoryMapper {
     Category mapNewCategoryDtoToCategory(NewCategoryDto dto);
 
     CategoryDto mapCategoryToDto(Category cat);
-
-    default Category updateCategory(CategoryDto changes, Category category) {
-        if (changes.getName() != null) {
-            category.setName(changes.getName());
-        }
-        return category;
-    }
 }

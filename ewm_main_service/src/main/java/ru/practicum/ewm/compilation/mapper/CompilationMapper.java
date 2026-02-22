@@ -14,14 +14,4 @@ public interface CompilationMapper {
     Compilation mapNewCompilationToEntity(NewCompilationDto dto);
 
     CompilationDto mapEntityToDto(Compilation compilation);
-
-    default Compilation updateCompilation(Compilation old, UpdateCompilationDto dto) {
-        if (dto.getTitle() != null) {
-            old.setTitle(dto.getTitle());
-        }
-        if (dto.getPinned() != null) {
-            old.setPinned(dto.getPinned());
-        }
-        return old;
-    }
 }

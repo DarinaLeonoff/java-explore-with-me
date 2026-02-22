@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.exception.notFound.RequestNotFound;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.request.service.RequestPrivateService;
+import ru.practicum.ewm.request.service.RequestService;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class RequestControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private RequestPrivateService service;
+    private RequestService service;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -33,30 +33,25 @@ public class RequestControllerTest {
 
         when(service.makeRequest(1L, 2L)).thenReturn(dto);
 
-        mockMvc.perform(post("/users/1/requests")
-                        .param("eventId", "2"))
-                .andExpect(status().isCreated());
+        mockMvc.perform(post("/users/1/requests").param("eventId", "2")).andExpect(status().isCreated());
 
         verify(service).makeRequest(1L, 2L);
     }
 
     @Test
     void shouldFailWhenEventIdMissing() throws Exception {
-        mockMvc.perform(post("/users/1/requests"))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/users/1/requests")).andExpect(status().isBadRequest());
 
         verifyNoInteractions(service);
     }
 
     @Test
     void shouldReturnUserRequests() throws Exception {
-        List<ParticipationRequestDto> list =
-                List.of(new ParticipationRequestDto());
+        List<ParticipationRequestDto> list = List.of(new ParticipationRequestDto());
 
         when(service.getUserRequests(1L)).thenReturn(list);
 
-        mockMvc.perform(get("/users/1/requests"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/users/1/requests")).andExpect(status().isOk());
 
         verify(service).getUserRequests(1L);
     }
@@ -67,18 +62,15 @@ public class RequestControllerTest {
 
         when(service.cancelRequest(1L, 2L)).thenReturn(dto);
 
-        mockMvc.perform(patch("/users/1/requests/2/cancel"))
-                .andExpect(status().isOk());
+        mockMvc.perform(patch("/users/1/requests/2/cancel")).andExpect(status().isOk());
 
         verify(service).cancelRequest(1L, 2L);
     }
 
     @Test
     void shouldHandleNotFound() throws Exception {
-        when(service.cancelRequest(anyLong(), anyLong()))
-                .thenThrow(new RequestNotFound(2L));
+        when(service.cancelRequest(anyLong(), anyLong())).thenThrow(new RequestNotFound(2L));
 
-        mockMvc.perform(patch("/users/1/requests/2/cancel"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(patch("/users/1/requests/2/cancel")).andExpect(status().isNotFound());
     }
 }

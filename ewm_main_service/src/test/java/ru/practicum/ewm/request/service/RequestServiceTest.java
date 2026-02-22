@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestPrivateServiceTest {
+public class RequestServiceTest {
     @Mock
     private EventRepository eventRepository;
 
@@ -49,7 +49,7 @@ public class RequestPrivateServiceTest {
     private RequestMapper mapper;
 
     @InjectMocks
-    private RequestPrivateServiceImpl service;
+    private RequestServiceImpl service;
 
     @Test
     void shouldMakeRequest() {
@@ -93,7 +93,8 @@ public class RequestPrivateServiceTest {
         when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
         when(userRepository.findById(initiator.getId())).thenReturn(Optional.of(initiator));
 
-        ConflictException ex = assertThrows(ConflictException.class, () -> service.makeRequest(initiator.getId(), event.getId()));
+        ConflictException ex = assertThrows(ConflictException.class,
+                () -> service.makeRequest(initiator.getId(), event.getId()));
         assertEquals("Initiator can not make request", ex.getMessage());
     }
 
@@ -111,7 +112,8 @@ public class RequestPrivateServiceTest {
         when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
         when(userRepository.findById(requester.getId())).thenReturn(Optional.of(requester));
 
-        ConflictException ex = assertThrows(ConflictException.class, () -> service.makeRequest(requester.getId(), event.getId()));
+        ConflictException ex = assertThrows(ConflictException.class,
+                () -> service.makeRequest(requester.getId(), event.getId()));
         assertEquals("Event is not published", ex.getMessage());
     }
 
@@ -131,7 +133,8 @@ public class RequestPrivateServiceTest {
         when(userRepository.findById(requester.getId())).thenReturn(Optional.of(requester));
         when(requestRepository.existsByUserIdAndEventId(requester.getId(), event.getId())).thenReturn(true);
 
-        ConflictException ex = assertThrows(ConflictException.class, () -> service.makeRequest(requester.getId(), event.getId()));
+        ConflictException ex = assertThrows(ConflictException.class,
+                () -> service.makeRequest(requester.getId(), event.getId()));
         assertEquals("Duplicate request", ex.getMessage());
     }
 
@@ -154,7 +157,8 @@ public class RequestPrivateServiceTest {
         when(userRepository.findById(requester.getId())).thenReturn(Optional.of(requester));
         when(requestRepository.existsByUserIdAndEventId(requester.getId(), event.getId())).thenReturn(false);
 
-        ConflictException ex = assertThrows(ConflictException.class, () -> service.makeRequest(requester.getId(), event.getId()));
+        ConflictException ex = assertThrows(ConflictException.class,
+                () -> service.makeRequest(requester.getId(), event.getId()));
         assertEquals("Limit reached", ex.getMessage());
     }
 
@@ -509,7 +513,10 @@ public class RequestPrivateServiceTest {
     }
 
     private Event generateEvent(Long id) {
-        return Event.builder().id(id).createdOn(LocalDateTime.now()).title("Title").annotation("Annotation").description("Description").eventDate(LocalDateTime.now().plusDays(5)).paid(true).participantLimit(0).requestModeration(false).confirmedRequests(0).state(EventState.PENDING).location(Location.builder().build()).views(0L).build();
+        return Event.builder().id(id).createdOn(LocalDateTime.now()).title("Title").annotation("Annotation")
+                .description("Description").eventDate(LocalDateTime.now().plusDays(5)).paid(true).participantLimit(0)
+                .requestModeration(false).confirmedRequests(0).state(EventState.PENDING)
+                .location(Location.builder().build()).views(0L).build();
     }
 
     private User generateUser(Long id) {
@@ -525,6 +532,7 @@ public class RequestPrivateServiceTest {
     }
 
     private ParticipationRequestDto generateParticipationRequestDto(Long id) {
-        return ParticipationRequestDto.builder().id(id).status(RequestState.PENDING).created(LocalDateTime.now()).build();
+        return ParticipationRequestDto.builder().id(id).status(RequestState.PENDING).created(LocalDateTime.now())
+                .build();
     }
 }

@@ -42,7 +42,7 @@ public class EventPublicServiceTest {
     private StatsClient client;
 
     @InjectMocks
-    private EventPublicServiceImpl service;
+    private EventServiceImpl service;
 
     @Test
     void shouldReturnEventList() {
@@ -66,7 +66,7 @@ public class EventPublicServiceTest {
 
         when(client.getStats(any(), any(), anyList(), eq(true))).thenReturn(List.of(stats));
 
-        List<EventShortDto> result = service.getEventList("text", List.of(1), true, null, null, false,
+        List<EventShortDto> result = service.getPublicEventList("text", List.of(1), true, null, null, false,
                 SortType.EVENT_DATE, 0, 10, "127.0.0.1");
 
         assertEquals(1, result.size());
@@ -80,7 +80,8 @@ public class EventPublicServiceTest {
         String end = "2025-01-01 10:00:00";
 
         assertThrows(IllegalStateException.class,
-                () -> service.getEventList(null, null, null, start, end, false, SortType.EVENT_DATE, 0, 10, "ip"));
+                () -> service.getPublicEventList(null, null, null, start, end, false, SortType.EVENT_DATE, 0, 10,
+                        "ip"));
 
         verifyNoInteractions(repository);
     }
@@ -99,7 +100,7 @@ public class EventPublicServiceTest {
 
         when(mapper.mapEventToFullDto(event)).thenReturn(dto);
 
-        EventFullDto result = service.getEvent(1L, "ip");
+        EventFullDto result = service.getPublicEvent(1L, "ip");
 
         assertEquals(dto, result);
         verify(client).hit(Constants.APP, Constants.getEventUri(1L), "ip");
@@ -110,7 +111,7 @@ public class EventPublicServiceTest {
 
         when(repository.findByIdAndState(anyLong(), any())).thenReturn(Optional.empty());
 
-        assertThrows(EventNotFound.class, () -> service.getEvent(1L, "ip"));
+        assertThrows(EventNotFound.class, () -> service.getPublicEvent(1L, "ip"));
     }
 
     @Test
@@ -128,7 +129,7 @@ public class EventPublicServiceTest {
 
         when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
-        service.getEvent(1L, "ip");
+        service.getPublicEvent(1L, "ip");
 
         assertEquals(10L, event.getViews());
     }
@@ -144,7 +145,7 @@ public class EventPublicServiceTest {
 
         when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
-        service.getEvent(1L, "ip");
+        service.getPublicEvent(1L, "ip");
 
         verify(repository, atLeast(2)).findByIdAndState(1L, EventState.PUBLISHED);
     }
@@ -154,7 +155,7 @@ public class EventPublicServiceTest {
 
         when(repository.findAll((Specification<Event>) any(), (Pageable) any())).thenReturn(Page.empty());
 
-        service.getEventList(null, null, null, null, null, false, SortType.EVENT_DATE, 0, 10, "ip");
+        service.getPublicEventList(null, null, null, null, null, false, SortType.EVENT_DATE, 0, 10, "ip");
 
         verify(client).hit(Constants.APP, "/events", "ip");
     }

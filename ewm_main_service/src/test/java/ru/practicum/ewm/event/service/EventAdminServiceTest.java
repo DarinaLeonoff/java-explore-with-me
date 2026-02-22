@@ -9,11 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import ru.practicum.ewm.category.service.CategoryPublicService;
+import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.updateDto.StateAdminAction;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventAdminRequest;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 
@@ -23,14 +26,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EventAdminServiceTest {
     @Mock
-    private CategoryPublicService categoryService;
+    private CategoryRepository categoryRepository;
 
     @Mock
     private EventRepository repository;
@@ -39,7 +41,7 @@ public class EventAdminServiceTest {
     private EventMapper mapper;
 
     @InjectMocks
-    private EventAdminServiceImpl service;
+    private EventServiceImpl service;
 
     @Test
     void shouldReturnMappedEvents() {
@@ -55,7 +57,7 @@ public class EventAdminServiceTest {
         when(repository.findAll((Specification<Event>) any(), (Pageable) any())).thenReturn(page);
         when(mapper.mapEventToFullDto(event)).thenReturn(dto);
 
-        List<EventFullDto> result = service.getEvent(users, states, categories, null, null, 0, 10);
+        List<EventFullDto> result = service.adminGetEvent(users, states, categories, null, null, 0, 10);
 
         assertEquals(1, result.size());
         assertEquals(dto, result.get(0));
@@ -67,87 +69,89 @@ public class EventAdminServiceTest {
     void shouldParseDateRange() {
         Event event = new Event();
 
-        when(repository.findAll((Specification<Event>) any(), (Pageable) any())).thenReturn(new PageImpl<>(List.of(event)));
+        when(repository.findAll((Specification<Event>) any(), (Pageable) any())).thenReturn(
+                new PageImpl<>(List.of(event)));
 
-        service.getEvent(new ArrayList<>(List.of(1L)), List.of("PUBLISHED"), new ArrayList<>(List.of(2)), "2025-01-01 10:00:00", "2025-01-02 10:00:00", 0, 10);
+        service.adminGetEvent(new ArrayList<>(List.of(1L)), List.of("PUBLISHED"), new ArrayList<>(List.of(2)),
+                "2025-01-01 10:00:00", "2025-01-02 10:00:00", 0, 10);
 
         verify(repository).findAll((Specification<Event>) any(), (Pageable) any());
     }
 
-//    @Test
-//    void shouldUpdateEvent() {
-//        Long id = 1L;
-//
-//        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-//        request.setCategory(5);
-//
-//        Event event = new Event();
-//        CategoryDto category = new CategoryDto();
-//        Event updated = new Event();
-//        EventFullDto dto = new EventFullDto();
-//
-//        when(repository.findById(id)).thenReturn(Optional.of(event));
-//        when(categoryService.getCategory(5)).thenReturn(category);
-//        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
-//        when(mapper.mapEventToFullDto(updated)).thenReturn(dto);
-//
-//        EventFullDto result = service.updateEvent(id, request);
-//
-//        assertEquals(dto, result);
-//    }
+    @Test
+    void shouldUpdateEvent() {
+        Long id = 1L;
 
-//    @Test
-//    void shouldUpdateWithoutCategory() {
-//        Long id = 1L;
-//
-//        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-//
-//        when(repository.findById(id)).thenReturn(Optional.of(new Event()));
-//        when(mapper.updateEvent(any(), eq(request), isNull())).thenReturn(new Event());
-//        when(mapper.mapEventToFullDto(any())).thenReturn(new EventFullDto());
-//
-//        service.updateEvent(id, request);
-//
-//        verify(categoryService, never()).getCategory(anyInt());
-//    }
+        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
+        request.setCategory(5);
 
-//    @Test
-//    void shouldPublishEvent() {
-//        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-//        request.setStateAction(StateAdminAction.PUBLISH_EVENT);
-//
-//        Event updated = new Event();
-//
-//        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
-//        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
-//        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
-//
-//        service.updateEvent(1L, request);
-//
-//        assertEquals(EventState.PUBLISHED, updated.getState());
-//    }
-//
-//    @Test
-//    void shouldRejectEvent() {
-//        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-//        request.setStateAction(StateAdminAction.REJECT_EVENT);
-//
-//        Event updated = new Event();
-//
-//        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
-//        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
-//        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
-//
-//        service.updateEvent(1L, request);
-//
-//        assertEquals(EventState.CANCELED, updated.getState());
-//    }
+        Event event = new Event();
+        Category category = new Category();
+        Event updated = new Event();
+        EventFullDto dto = new EventFullDto();
+
+        when(repository.findById(id)).thenReturn(Optional.of(event));
+        when(categoryRepository.findById(5)).thenReturn(Optional.of(category));
+        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
+        when(mapper.mapEventToFullDto(updated)).thenReturn(dto);
+
+        EventFullDto result = service.adminUpdateEvent(id, request);
+
+        assertEquals(dto, result);
+    }
+
+    @Test
+    void shouldUpdateWithoutCategory() {
+        Long id = 1L;
+
+        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
+
+        when(repository.findById(id)).thenReturn(Optional.of(new Event()));
+        when(mapper.updateEvent(any(), eq(request), isNull())).thenReturn(new Event());
+        when(mapper.mapEventToFullDto(any())).thenReturn(new EventFullDto());
+
+        service.adminUpdateEvent(id, request);
+
+        verify(categoryRepository, never()).findById(anyInt());
+    }
+
+    @Test
+    void shouldPublishEvent() {
+        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
+        request.setStateAction(StateAdminAction.PUBLISH_EVENT);
+
+        Event updated = new Event();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
+        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
+        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
+
+        service.adminUpdateEvent(1L, request);
+
+        assertEquals(EventState.PUBLISHED, updated.getState());
+    }
+
+    @Test
+    void shouldRejectEvent() {
+        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
+        request.setStateAction(StateAdminAction.REJECT_EVENT);
+
+        Event updated = new Event();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
+        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
+        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
+
+        service.adminUpdateEvent(1L, request);
+
+        assertEquals(EventState.CANCELED, updated.getState());
+    }
 
     @Test
     void shouldThrowWhenEventNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EventNotFound.class, () -> service.updateEvent(1L, new UpdateEventAdminRequest()));
+        assertThrows(EventNotFound.class, () -> service.adminUpdateEvent(1L, new UpdateEventAdminRequest()));
     }
 
 }

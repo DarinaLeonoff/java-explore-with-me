@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class RequestPrivateServiceImpl implements RequestPrivateService {
+public class RequestServiceImpl implements RequestService {
     @Autowired
     private EventRepository eventRepository;
     @Autowired
@@ -38,76 +38,33 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
 
     @Override
     public ParticipationRequestDto makeRequest(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFound(eventId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFound(userId));
+        Event event = getEvent(eventId);
+        User user = getUser(userId);
 
-        // инициатор не может отправлять заявки
-        if (event.getInitiator().getId().equals(userId)) {
-            throw new ConflictException("Initiator can not make request");
-        }
+        userIsNotInitiator(event, userId);
+        haveToBePublished(event);
+        noDuplicate(userId, eventId);
 
-        // событие должно быть опубликовано
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new ConflictException("Event is not published");
-        }
-
-        // запрет дубликатов
-        if (requestRepository.existsByUserIdAndEventId(userId, eventId)) {
-            throw new ConflictException("Duplicate request");
-        }
-
-        long confirmedCount = event.getConfirmedRequests();
-
-        RequestState status;
-
-        // если нет лимита
-        if (event.getParticipantLimit() == 0) {
-            status = RequestState.CONFIRMED;
-
-            // если модерация выключена
-        } else if (!event.isRequestModeration()) {
-
-            if (confirmedCount >= event.getParticipantLimit()) {
-                throw new ConflictException("Limit reached");
-            }
-
-            status = RequestState.CONFIRMED;
-
-            // иначе PENDING
-        } else {
-            status = RequestState.PENDING;
-        }
-
-        Request request = Request.builder()
-                .user(user)
-                .event(event)
-                .status(status)
-                .created(LocalDateTime.now())
-                .build();
+        Request request = Request.builder().user(user).event(event).status(autoState(event))
+                .created(LocalDateTime.now()).build();
 
         requestRepository.save(request);
-
-        if (status == RequestState.CONFIRMED) {
-            event.setConfirmedRequests((int)confirmedCount + 1);
-            eventRepository.save(event);
-        }
+        setConfirmedRequest(request);
 
         return mapper.mapRequestToDto(request);
     }
 
     @Override
     public List<ParticipationRequestDto> getUserRequests(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFound(userId));
+        User user = getUser(userId);
         return requestRepository.findAllByUserId(userId).stream().map(mapper::mapRequestToDto).toList();
     }
 
     @Override
     public ParticipationRequestDto cancelRequest(long userId, long requestId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFound(userId));
-        Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFound(requestId));
+        User user = getUser(userId);
+        Request request = getRequest(requestId);
         request.setStatus(RequestState.CANCELED);
         return mapper.mapRequestToDto(requestRepository.save(request));
     }
@@ -121,11 +78,76 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
     public Map<String, List<ParticipationRequestDto>> acceptRequest(long userId, long eventId,
             EventRequestStatusUpdateRequest request) throws AccessException {
 
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
+        Event event = getEvent(eventId);
 
         if (!event.getInitiator().getId().equals(userId)) {
             throw new AccessRightsException("User " + userId + " is not initiator of event.");
         }
+
+        return mapRequestsAfterInitiatorModeration(request, event);
+    }
+
+    private void userIsNotInitiator(Event event, long userId) {
+        if (event.getInitiator().getId().equals(userId)) {
+            throw new ConflictException("Initiator can not make request");
+        }
+    }
+
+    private void haveToBePublished(Event event) {
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new ConflictException("Event is not published");
+        }
+    }
+
+    private void noDuplicate(long userId, long eventId) {
+        if (requestRepository.existsByUserIdAndEventId(userId, eventId)) {
+            throw new ConflictException("Duplicate request");
+        }
+    }
+
+    private RequestState autoState(Event event) {
+        long confirmedCount = event.getConfirmedRequests();
+        // если нет лимита
+        if (event.getParticipantLimit() == 0) {
+            return RequestState.CONFIRMED;
+
+            // если модерация выключена
+        } else if (!event.isRequestModeration()) {
+
+            if (confirmedCount >= event.getParticipantLimit()) {
+                throw new ConflictException("Limit reached");
+            }
+
+            return RequestState.CONFIRMED;
+
+            // иначе PENDING
+        } else {
+            return RequestState.PENDING;
+        }
+    }
+
+    private void setConfirmedRequest(Request request) {
+        if (request.getStatus() == RequestState.CONFIRMED) {
+            Event event = request.getEvent();
+            event.setConfirmedRequests((int) event.getConfirmedRequests() + 1);
+            eventRepository.save(event);
+        }
+    }
+
+    private Event getEvent(long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() -> new EventNotFound(eventId));
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFound(userId));
+    }
+
+    private Request getRequest(long id) {
+        return requestRepository.findById(id).orElseThrow(() -> new RequestNotFound(id));
+    }
+
+    private Map<String, List<ParticipationRequestDto>> mapRequestsAfterInitiatorModeration(
+            EventRequestStatusUpdateRequest request, Event event) {
 
         List<Request> requests = requestRepository.findAllById(request.getRequestIds());
 
@@ -160,7 +182,7 @@ public class RequestPrivateServiceImpl implements RequestPrivateService {
         requestRepository.saveAll(requests);
         eventRepository.save(event);
 
-        return Map.of("confirmedRequests", confirmed.stream().map(mapper::mapRequestToDto).toList(), "rejectedRequests", rejected.stream().map(mapper::mapRequestToDto).toList());
+        return Map.of("confirmedRequests", confirmed.stream().map(mapper::mapRequestToDto).toList(), "rejectedRequests",
+                rejected.stream().map(mapper::mapRequestToDto).toList());
     }
-
 }

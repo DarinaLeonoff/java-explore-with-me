@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.NewUserRequestDto;
 import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.service.UserAdminService;
+import ru.practicum.ewm.user.service.UserService;
 
 import java.util.List;
 
@@ -16,15 +16,15 @@ import java.util.List;
 @RequestMapping("/admin/users")
 public class UserController {
     @Autowired
-    private UserAdminService userService;
+    private UserService userService;
 
     //    получение информации о пользователях (List<UserDto>)
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> adminGetUsers(@RequestParam(required = false) List<Long> ids, @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size) {
+    public List<UserDto> adminGetUsers(@RequestParam(required = false) List<Long> ids,
+            @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
         log.info("Admin getting users from = {}, size = " + "{}, ids: {}", from, size, ids);
-        return userService.getUsers(ids, from, size);
+        return userService.adminGetUsers(ids, from, size);
     }
 
     //    добавление нового пользователя
@@ -32,7 +32,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto adminPostUser(@Valid @RequestBody NewUserRequestDto request) {
         log.info("Admin adding new User");
-        return userService.createUser(request);
+        return userService.adminCreateUser(request);
     }
 
     //    Удаление пользователей
@@ -40,7 +40,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void adminDeleteUser(@PathVariable long userId) {
         log.info("Admin deleting user({})", userId);
-        userService.deleteUser(userId);
+        userService.adminDeleteUser(userId);
     }
 
 }

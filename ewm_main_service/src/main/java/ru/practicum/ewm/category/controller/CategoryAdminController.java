@@ -7,34 +7,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
-import ru.practicum.ewm.category.service.CategoryAdminService;
+import ru.practicum.ewm.category.service.CategoryService;
 
 @Slf4j
 @RestController
 @RequestMapping("/admin/categories")
 public class CategoryAdminController {
     @Autowired
-    private CategoryAdminService service;
+    private CategoryService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     CategoryDto createNewCategory(@Valid @RequestBody NewCategoryDto dto) {
         log.info("Admin creating new category");
-        return service.createCategory(dto);
+        return service.adminCreateCategory(dto);
     }
 
     @PatchMapping("/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    CategoryDto aditCategory(@PathVariable int catId,
-            @Valid @RequestBody CategoryDto dto) {
+    CategoryDto aditCategory(@PathVariable int catId, @Valid @RequestBody CategoryDto dto) {
         log.info("Admin make changes in category {}", catId);
-        return service.aditCategory(dto, catId);
+        return service.adminUpdateCategory(dto, catId);
     }
 
     @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void removeCategory(@PathVariable int catId) {
         log.info("Admin remove category {}", catId);
-        service.removeCategory(catId);
+        service.adminRemoveCategory(catId);
     }
 }

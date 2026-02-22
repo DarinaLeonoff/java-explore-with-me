@@ -35,7 +35,7 @@ public class CompilationAdminServiceTest {
     private CompilationRepository compilationRepository;
 
     @InjectMocks
-    private CompilationAdminServiceImpl service;
+    private CompilationServiceImpl service;
 
     @Test
     void shouldCreateCompilation() {
@@ -54,7 +54,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(entity)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(resultDto);
 
-        CompilationDto result = service.createCompilation(dto);
+        CompilationDto result = service.adminCreateCompilation(dto);
 
         assertEquals(resultDto, result);
         verify(eventRepository).findAllById(List.of(1L, 2L));
@@ -72,7 +72,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(entity)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(new CompilationDto());
 
-        service.createCompilation(dto);
+        service.adminCreateCompilation(dto);
 
         verify(eventRepository, never()).findAllById(any());
     }
@@ -88,7 +88,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(entity)).thenReturn(entity);
         when(mapper.mapEntityToDto(any())).thenReturn(new CompilationDto());
 
-        service.createCompilation(dto);
+        service.adminCreateCompilation(dto);
 
         verify(eventRepository, never()).findAllById(any());
     }
@@ -109,7 +109,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(updated)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(result);
 
-        CompilationDto response = service.updateCompilation(id, dto);
+        CompilationDto response = service.adminUpdateCompilation(id, dto);
 
         assertEquals(result, response);
     }
@@ -131,7 +131,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(updated)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(result);
 
-        CompilationDto response = service.updateCompilation(id, dto);
+        CompilationDto response = service.adminUpdateCompilation(id, dto);
 
         assertEquals(result, response);
     }
@@ -153,7 +153,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(updated)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(result);
 
-        CompilationDto response = service.updateCompilation(id, dto);
+        CompilationDto response = service.adminUpdateCompilation(id, dto);
 
         assertEquals(result, response);
     }
@@ -175,7 +175,7 @@ public class CompilationAdminServiceTest {
         when(compilationRepository.save(updated)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(result);
 
-        CompilationDto response = service.updateCompilation(id, dto);
+        CompilationDto response = service.adminUpdateCompilation(id, dto);
 
         assertEquals(result, response);
     }
@@ -185,12 +185,12 @@ public class CompilationAdminServiceTest {
     void shouldThrowWhenCompilationNotFound() {
         when(compilationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(CompilationNotFound.class, () -> service.updateCompilation(1L, new UpdateCompilationDto()));
+        assertThrows(CompilationNotFound.class, () -> service.adminUpdateCompilation(1L, new UpdateCompilationDto()));
     }
 
     @Test
     void shouldDeleteCompilation() {
-        service.removeCompilation(10L);
+        service.adminRemoveCompilation(10L);
 
         verify(compilationRepository).deleteById(10L);
     }

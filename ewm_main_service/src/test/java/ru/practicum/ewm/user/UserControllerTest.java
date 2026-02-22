@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.user.dto.NewUserRequestDto;
 import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.service.UserAdminService;
+import ru.practicum.ewm.user.service.UserService;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserAdminService service;
+    private UserService service;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -34,17 +34,15 @@ public class UserControllerTest {
         UserDto dto1 = UserDto.builder().id(1L).name("name").email("emain@ya.ru").build();
         UserDto dto2 = UserDto.builder().id(2L).name("name").email("emain@ya.ru").build();
 
-        mockMvc.perform(get("/admin/users?ids=1&ids=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(List.of(dto1, dto2))))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/admin/users?ids=1&ids=2").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(List.of(dto1, dto2)))).andExpect(status().isOk());
     }
 
     @Test
     void deleteShouldReturnNoContent() throws Exception {
         mockMvc.perform(delete("/admin/users/1")).andExpect(status().isNoContent());
 
-        verify(service, times(1)).deleteUser(1);
+        verify(service, times(1)).adminDeleteUser(1);
     }
 
     @Test
@@ -52,12 +50,10 @@ public class UserControllerTest {
         NewUserRequestDto dto = NewUserRequestDto.builder().name("nnnnName").email("email@ya.ru").build();
         UserDto userDto = UserDto.builder().id(1L).name("nnnnName").email("email@ya.ru").build();
 
-        when(service.createUser(any(NewUserRequestDto.class))).thenReturn(userDto);
+        when(service.adminCreateUser(any(NewUserRequestDto.class))).thenReturn(userDto);
 
-        mockMvc.perform(post("/admin/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
+        mockMvc.perform(post("/admin/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(userDto.getName()))
                 .andExpect(jsonPath("$.email").value(userDto.getEmail()));
     }

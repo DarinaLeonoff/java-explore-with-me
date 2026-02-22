@@ -25,14 +25,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserAdminServiceTest {
+public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
 
     @InjectMocks
-    private UserAdminServiceImpl userService;
+    private UserServiceImpl userService;
 
     private NewUserRequestDto req;
     private User user;
@@ -58,7 +58,7 @@ public class UserAdminServiceTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.mapUserToUserDto(user)).thenReturn(dto);
 
-        UserDto result = userService.createUser(req);
+        UserDto result = userService.adminCreateUser(req);
 
         assertEquals(1L, result.getId());
         assertEquals(req.getName(), result.getName());
@@ -66,7 +66,7 @@ public class UserAdminServiceTest {
     }
 
     @Test
-    void getUserTest() {
+    void getUserListTest() {
         List<Long> ids = List.of(1L);
         int from = 0;
         int size = 10;
@@ -77,7 +77,7 @@ public class UserAdminServiceTest {
 
         when(userMapper.mapUserToUserDto(user)).thenReturn(dto);
 
-        List<UserDto> result = userService.getUsers(ids, from, size);
+        List<UserDto> result = userService.adminGetUsers(ids, from, size);
 
         assertEquals(1, result.size());
         UserDto resultDto = result.getFirst();
@@ -91,26 +91,53 @@ public class UserAdminServiceTest {
     }
 
     @Test
-    void deleteUserTest() {
+    void adminDeleteUserTest() {
         long userId = 1L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        userService.deleteUser(userId);
+        userService.adminDeleteUser(userId);
 
         verify(userRepository).findById(userId);
         verify(userRepository).delete(user);
     }
 
     @Test
-    void deleteUserFallTest() {
+    void adminDeleteUserFallTest() {
         long userId = 1L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFound.class,
-                () -> userService.deleteUser(userId));
+        assertThrows(UserNotFound.class, () -> userService.adminDeleteUser(userId));
 
         verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void getUserTest() {
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+
+        when(userMapper.mapUserToUserDto(user)).thenReturn(dto);
+
+        UserDto result = userService.publicGetUserById(user.getId());
+
+        assertEquals(dto.getId(), result.getId());
+        assertEquals(dto.getName(), result.getName());
+        assertEquals(dto.getEmail(), result.getEmail());
+
+        verify(userRepository).findById(user.getId());
+        verify(userMapper).mapUserToUserDto(user);
+    }
+
+    @Test
+    void shouldThrowWhenUserNotFound() {
+        long id = 1L;
+
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFound.class, () -> userService.publicGetUserById(id));
+
+        verify(userRepository).findById(id);
     }
 }

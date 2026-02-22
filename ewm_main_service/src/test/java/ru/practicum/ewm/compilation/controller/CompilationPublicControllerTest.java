@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
-import ru.practicum.ewm.compilation.service.CompilationPublicService;
+import ru.practicum.ewm.compilation.service.CompilationService;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class CompilationPublicControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CompilationPublicService service;
+    private CompilationService service;
 
     @Autowired
     private ObjectMapper mapper;
@@ -39,34 +39,30 @@ public class CompilationPublicControllerTest {
 
     @Test
     void shouldReturnCompilationList() throws Exception {
-        when(service.getCompilations(anyBoolean(), anyInt(), anyInt())).thenReturn(List.of(dto));
+        when(service.getPublicCompilations(anyBoolean(), anyInt(), anyInt())).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/compilations?pinned=false&from=0&size=10")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(List.of(dto)))
-                )
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/compilations?pinned=false&from=0&size=10").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(List.of(dto)))).andExpect(status().isOk());
     }
 
     @Test
     void shouldPassNullPinnedToService() throws Exception {
 
-        when(service.getCompilations(null, 0, 10))
-                .thenReturn(List.of());
+        when(service.getPublicCompilations(null, 0, 10)).thenReturn(List.of());
 
-        mockMvc.perform(get("/compilations"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/compilations")).andExpect(status().isOk());
 
-        verify(service).getCompilations(null, 0, 10);
+        verify(service).getPublicCompilations(null, 0, 10);
     }
 
     @Test
     void shouldReturnCompilation() throws Exception {
 
-        when(service.getCompilationById(anyLong())).thenReturn(dto);
+        when(service.getPublicCompilationById(anyLong())).thenReturn(dto);
 
-        mockMvc.perform(get("/compilations/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1L)).andExpect(jsonPath("$.title").value(dto.getTitle()));
+        mockMvc.perform(get("/compilations/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value(dto.getTitle()));
 
-        verify(service).getCompilationById(eq(1L));
+        verify(service).getPublicCompilationById(eq(1L));
     }
 }

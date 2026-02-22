@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventAdminRequest;
-import ru.practicum.ewm.event.service.EventAdminService;
+import ru.practicum.ewm.event.service.EventService;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/admin/events")
 public class EventAdminController {
     @Autowired
-    private EventAdminService service;
+    private EventService service;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -23,13 +23,13 @@ public class EventAdminController {
             @RequestParam(required = false) List<Integer> categories, @RequestParam(required = false) String rangeStart,
             @RequestParam(required = false) String rangeEnd, @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
-        return service.getEvent(users, states, categories, rangeStart, rangeEnd, from, size);
+        return service.adminGetEvent(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     EventFullDto adminUpdateEvent(@PathVariable Long eventId, @RequestBody @Valid UpdateEventAdminRequest request) {
-        return service.updateEvent(eventId, request);
+        return service.adminUpdateEvent(eventId, request);
     }
 
 }

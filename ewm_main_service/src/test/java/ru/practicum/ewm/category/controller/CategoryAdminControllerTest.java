@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
-import ru.practicum.ewm.category.service.CategoryAdminService;
+import ru.practicum.ewm.category.service.CategoryService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -24,7 +24,7 @@ public class CategoryAdminControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CategoryAdminService service;
+    private CategoryService service;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -35,12 +35,10 @@ public class CategoryAdminControllerTest {
         dto.setName("Category");
         CategoryDto categoryDto = CategoryDto.builder().id(1).name(dto.getName()).build();
 
-        when(service.createCategory(any(NewCategoryDto.class))).thenReturn(categoryDto);
+        when(service.adminCreateCategory(any(NewCategoryDto.class))).thenReturn(categoryDto);
 
-        mockMvc.perform(post("/admin/categories")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
+        mockMvc.perform(post("/admin/categories").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(categoryDto.getId()))
                 .andExpect(jsonPath("$.name").value(categoryDto.getName()));
     }
@@ -49,22 +47,19 @@ public class CategoryAdminControllerTest {
     void editShouldReturnOk() throws Exception {
         CategoryDto categoryDto = CategoryDto.builder().id(1).name("adit category").build();
 
-        when(service.aditCategory(any(CategoryDto.class), anyInt())).thenReturn(categoryDto);
+        when(service.adminUpdateCategory(any(CategoryDto.class), anyInt())).thenReturn(categoryDto);
 
-        mockMvc.perform(patch("/admin/categories/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(categoryDto)))
-                .andExpect(status().isOk())
+        mockMvc.perform(patch("/admin/categories/1").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryDto))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(categoryDto.getId()))
                 .andExpect(jsonPath("$.name").value(categoryDto.getName()));
     }
 
     @Test
     void postShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/admin/categories/1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/admin/categories/1")).andExpect(status().isNoContent());
 
-        verify(service, times(1)).removeCategory(anyInt());
+        verify(service, times(1)).adminRemoveCategory(anyInt());
     }
 
 }

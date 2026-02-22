@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
 import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 import ru.practicum.ewm.compilation.dto.UpdateCompilationDto;
-import ru.practicum.ewm.compilation.service.CompilationAdminService;
+import ru.practicum.ewm.compilation.service.CompilationService;
 import ru.practicum.ewm.exception.notFound.CompilationNotFound;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +25,7 @@ public class CompilationAdminControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CompilationAdminService service;
+    private CompilationService service;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -38,40 +38,37 @@ public class CompilationAdminControllerTest {
         CompilationDto result = new CompilationDto();
         result.setId(1L);
 
-        when(service.createCompilation(any())).thenReturn(result);
+        when(service.adminCreateCompilation(any())).thenReturn(result);
 
-        mockMvc.perform(post("/admin/compilations").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated()).andExpect(jsonPath("$.id").value(1));
+        mockMvc.perform(post("/admin/compilations").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1));
 
-        verify(service).createCompilation(any());
+        verify(service).adminCreateCompilation(any());
     }
 
     @Test
     void shouldFailValidationWhenTitleMissing() throws Exception {
         NewCompilationDto dto = new NewCompilationDto();
 
-        mockMvc.perform(post("/admin/compilations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/admin/compilations").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest());
 
         verifyNoInteractions(service);
     }
 
     @Test
     void shouldDeleteCompilation() throws Exception {
-        mockMvc.perform(delete("/admin/compilations/5"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/admin/compilations/5")).andExpect(status().isNoContent());
 
-        verify(service).removeCompilation(5);
+        verify(service).adminRemoveCompilation(5);
     }
 
     @Test
     void shouldHandleNotFoundOnDelete() throws Exception {
-        doThrow(new CompilationNotFound(5L))
-                .when(service).removeCompilation(5L);
+        doThrow(new CompilationNotFound(5L)).when(service).adminRemoveCompilation(5L);
 
-        mockMvc.perform(delete("/admin/compilations/5"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/admin/compilations/5")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -82,14 +79,12 @@ public class CompilationAdminControllerTest {
         CompilationDto result = new CompilationDto();
         result.setId(10L);
 
-        when(service.updateCompilation(eq(10L), any())).thenReturn(result);
+        when(service.adminUpdateCompilation(eq(10L), any())).thenReturn(result);
 
-        mockMvc.perform(patch("/admin/compilations/10")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+        mockMvc.perform(patch("/admin/compilations/10").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(10L));
 
-        verify(service).updateCompilation(eq(10L), any());
+        verify(service).adminUpdateCompilation(eq(10L), any());
     }
 }

@@ -29,21 +29,13 @@ public class EventMapperTest {
 
     @BeforeEach
     void setup() {
-        event = Event.builder()
-                .id(1L)
-                .createdOn(LocalDateTime.now())
-                .initiator(User.builder().id(1L)
-                        .name("name")
-                        .email("name@ya.ru").build())
-                .title("title")
-                .annotation("Annotation")
-                .description("description")
-                .eventDate(LocalDateTime.now().plusDays(2))
-                .category(Category.builder().id(1).name("Category").build())
-                .paid(false).participantLimit(20).publishedOn(LocalDateTime.now())
-                .requestModeration(false).confirmedRequests(5)
-                .state(EventState.PUBLISHED).location(Location.builder().lat(22.50).lon(50.20).build())
-                .views(20L).build();
+        event = Event.builder().id(1L).createdOn(LocalDateTime.now())
+                .initiator(User.builder().id(1L).name("name").email("name@ya.ru").build()).title("title")
+                .annotation("Annotation").description("description").eventDate(LocalDateTime.now().plusDays(2))
+                .category(Category.builder().id(1).name("Category").build()).paid(false).participantLimit(20)
+                .publishedOn(LocalDateTime.now()).requestModeration(false).confirmedRequests(5)
+                .state(EventState.PUBLISHED).location(Location.builder().lat(22.50).lon(50.20).build()).views(20L)
+                .build();
     }
 
     @Test
@@ -86,11 +78,13 @@ public class EventMapperTest {
 
     @Test
     void convertNewEventToEvent() {
-        NewEventDto dto = NewEventDto.builder().annotation("annotation text").category(1).description("description text").eventDate(LocalDateTime.now()).location(Location.builder().build()).paid(true).participantLimit(10).requestModeration(false).title("title").build();
+        NewEventDto dto = NewEventDto.builder().annotation("annotation text").category(1)
+                .description("description text").eventDate(LocalDateTime.now()).location(Location.builder().build())
+                .paid(true).participantLimit(10).requestModeration(false).title("title").build();
 
-        Event event1 = mapper.mapNewEventToEvent(dto,
-                CategoryDto.builder().id(1).name("Category").build(),
-                UserDto.builder().id(1L).name("name").email("name@ya.ru").build());
+        Event event1 = mapper.mapNewEventToEvent(dto);
+        event1.setInitiator(User.builder().id(1L).name("name").email("name@ya.ru").build());
+        event1.setCategory(Category.builder().id(1).name("Category").build());
 
         assertNotNull(event1);
 

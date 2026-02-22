@@ -10,10 +10,10 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.updateDto.UpdateEventUserRequest;
-import ru.practicum.ewm.event.service.EventPrivateService;
+import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.request.service.RequestPrivateService;
+import ru.practicum.ewm.request.service.RequestService;
 
 import java.util.List;
 import java.util.Map;
@@ -23,15 +23,15 @@ import java.util.Map;
 @RequestMapping("/users/{userId}/events")
 public class EventPrivateController {
     @Autowired
-    private EventPrivateService eventPrivateService;
+    private EventService eventService;
     @Autowired
-    private RequestPrivateService requestPrivateService;
+    private RequestService requestService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     EventFullDto postNewEvent(@RequestBody @Valid NewEventDto dto, @PathVariable long userId) {
         log.info("post new event by user {}", userId);
-        return eventPrivateService.postNewEvent(dto, userId);
+        return eventService.userPostNewEvent(dto, userId);
     }
 
     @GetMapping
@@ -40,14 +40,14 @@ public class EventPrivateController {
     List<EventShortDto> getListOfUserEvents(@PathVariable long userId, @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Get events posted by user {}", userId);
-        return eventPrivateService.getUserEvents(userId, from, size);
+        return eventService.userGetUserEvents(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
         //событие из числа добавленных юзером
     EventFullDto getUserEventById(@PathVariable long userId, @PathVariable long eventId) {
-        return eventPrivateService.getUserEventById(userId, eventId);
+        return eventService.userGetUserEventById(userId, eventId);
     }
 
 
@@ -55,19 +55,19 @@ public class EventPrivateController {
     @ResponseStatus(HttpStatus.OK)
     EventFullDto updateUserEvent(@PathVariable long userId, @PathVariable long eventId,
             @RequestBody @Valid UpdateEventUserRequest request) {
-        return eventPrivateService.updateUserEvent(userId, eventId, request);
+        return eventService.userUpdateUserEvent(userId, eventId, request);
     }
 
     @PatchMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     Map<String, List<ParticipationRequestDto>> acceptRequest(@PathVariable long userId, @PathVariable long eventId,
             @RequestBody @Valid EventRequestStatusUpdateRequest request) throws AccessException {
-        return requestPrivateService.acceptRequest(userId, eventId, request);
+        return requestService.acceptRequest(userId, eventId, request);
     }
 
     @GetMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     List<ParticipationRequestDto> getEventRequests(@PathVariable long userId, @PathVariable long eventId) {
-        return requestPrivateService.getEventRequests(userId, eventId);
+        return requestService.getEventRequests(userId, eventId);
     }
 }
