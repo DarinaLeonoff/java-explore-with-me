@@ -21,6 +21,7 @@ import ru.practicum.ewm.exception.IllegalStateException;
 import ru.practicum.ewm.exception.notFound.EventNotFound;
 import ru.practicum.stats.client.StatsClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,27 +46,28 @@ public class EventPublicServiceTest {
 
     @Test
     void shouldReturnEventList() {
-
         Event event = new Event();
+        event.setId(1L);
+        event.setCreatedOn(LocalDateTime.now());
+        event.setEventDate(LocalDateTime.now().plusDays(1));
+        event.setViews(0L);
+
         EventShortDto dto = new EventShortDto();
 
-        when(repository.findAll((Specification<Event>)any(), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(event)));
+        when(repository.findAll((Specification<Event>) any(), any(Pageable.class))).thenReturn(
+                new PageImpl<>(List.of(event)));
 
         when(mapper.mapEventToShortDto(event)).thenReturn(dto);
 
-        List<EventShortDto> result = service.getEventList(
-                "text",
-                List.of(1),
-                true,
-                null,
-                null,
-                false,
-                SortType.EVENT_DATE,
-                0,
-                10,
-                "127.0.0.1"
-        );
+        //мок статистики
+        StatsResponseDto stats = new StatsResponseDto();
+        stats.setUri(Constants.getEventUri(1L));
+        stats.setHits(10L);
+
+        when(client.getStats(any(), any(), anyList(), eq(true))).thenReturn(List.of(stats));
+
+        List<EventShortDto> result = service.getEventList("text", List.of(1), true, null, null, false,
+                SortType.EVENT_DATE, 0, 10, "127.0.0.1");
 
         assertEquals(1, result.size());
         verify(client).hit(Constants.APP, "/events", "127.0.0.1");
@@ -77,15 +79,8 @@ public class EventPublicServiceTest {
         String start = "2025-01-02 10:00:00";
         String end = "2025-01-01 10:00:00";
 
-        assertThrows(IllegalStateException.class, () ->
-                service.getEventList(
-                        null, null, null,
-                        start, end,
-                        false, SortType.EVENT_DATE,
-                        0, 10,
-                        "ip"
-                )
-        );
+        assertThrows(IllegalStateException.class,
+                () -> service.getEventList(null, null, null, start, end, false, SortType.EVENT_DATE, 0, 10, "ip"));
 
         verifyNoInteractions(repository);
     }
@@ -98,11 +93,9 @@ public class EventPublicServiceTest {
 
         EventFullDto dto = new EventFullDto();
 
-        when(repository.findByIdAndState(1L, EventState.PUBLISHED))
-                .thenReturn(Optional.of(event));
+        when(repository.findByIdAndState(1L, EventState.PUBLISHED)).thenReturn(Optional.of(event));
 
-        when(client.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(List.of(new StatsResponseDto()));
+        when(client.getStats(any(), any(), any(), anyBoolean())).thenReturn(List.of(new StatsResponseDto()));
 
         when(mapper.mapEventToFullDto(event)).thenReturn(dto);
 
@@ -115,12 +108,9 @@ public class EventPublicServiceTest {
     @Test
     void shouldThrowIfEventNotFound() {
 
-        when(repository.findByIdAndState(anyLong(), any()))
-                .thenReturn(Optional.empty());
+        when(repository.findByIdAndState(anyLong(), any())).thenReturn(Optional.empty());
 
-        assertThrows(EventNotFound.class, () ->
-                service.getEvent(1L, "ip")
-        );
+        assertThrows(EventNotFound.class, () -> service.getEvent(1L, "ip"));
     }
 
     @Test
@@ -132,11 +122,9 @@ public class EventPublicServiceTest {
         StatsResponseDto stats = new StatsResponseDto();
         stats.setHits(10L);
 
-        when(repository.findByIdAndState(1L, EventState.PUBLISHED))
-                .thenReturn(Optional.of(event));
+        when(repository.findByIdAndState(1L, EventState.PUBLISHED)).thenReturn(Optional.of(event));
 
-        when(client.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(List.of(stats));
+        when(client.getStats(any(), any(), any(), anyBoolean())).thenReturn(List.of(stats));
 
         when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
@@ -150,34 +138,23 @@ public class EventPublicServiceTest {
 
         Event event = new Event();
 
-        when(repository.findByIdAndState(anyLong(), any()))
-                .thenReturn(Optional.empty())
-                .thenReturn(Optional.of(event));
+        when(repository.findByIdAndState(anyLong(), any())).thenReturn(Optional.empty()).thenReturn(Optional.of(event));
 
-        when(client.getStats(any(), any(), any(), anyBoolean()))
-                .thenReturn(List.of());
+        when(client.getStats(any(), any(), any(), anyBoolean())).thenReturn(List.of());
 
         when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
         service.getEvent(1L, "ip");
 
-        verify(repository, atLeast(2))
-                .findByIdAndState(1L, EventState.PUBLISHED);
+        verify(repository, atLeast(2)).findByIdAndState(1L, EventState.PUBLISHED);
     }
 
     @Test
     void shouldCallStatsHit() {
 
-        when(repository.findAll((Specification<Event>) any(), (Pageable) any()))
-                .thenReturn(Page.empty());
+        when(repository.findAll((Specification<Event>) any(), (Pageable) any())).thenReturn(Page.empty());
 
-        service.getEventList(
-                null, null, null,
-                null, null,
-                false, SortType.EVENT_DATE,
-                0, 10,
-                "ip"
-        );
+        service.getEventList(null, null, null, null, null, false, SortType.EVENT_DATE, 0, 10, "ip");
 
         verify(client).hit(Constants.APP, "/events", "ip");
     }

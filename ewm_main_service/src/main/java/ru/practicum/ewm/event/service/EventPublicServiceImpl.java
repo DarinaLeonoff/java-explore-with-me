@@ -23,7 +23,9 @@ import ru.practicum.stats.client.StatsClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,17 +41,39 @@ public class EventPublicServiceImpl implements EventPublicService {
     public List<EventShortDto> getEventList(String text, List<Integer> categories, Boolean paid, String rangeStart,
             String rangeEnd, Boolean onlyAvailable, SortType sort, int from, int size, String ip) {
 
+        //получение корректной даты
         LocalDateTime start = rangeStart == null ? null : LocalDateTime.parse(rangeStart, Constants.DATE_FORMATTER);
         LocalDateTime end = rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, Constants.DATE_FORMATTER);
 
         if (start != null && end != null && start.isAfter(end)) {
             throw new IllegalStateException("rangeStart must be before rangeEnd");
         }
+
+        // фиксация просмотра страницы
         client.hit(Constants.APP, "/events", ip);
 
-        Specification<Event> spec = EventSpecification.withPublicFilters(text, categories, paid, start, end, onlyAvailable);
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by(sort == SortType.VIEWS ? "views" : "eventDate").descending());
+        //получения списка событий по старым views
+        Specification<Event> spec = EventSpecification.withPublicFilters(text, categories, paid, start, end,
+                onlyAvailable);
+        Pageable pageable = PageRequest.of(from / size, size,
+                Sort.by(sort == SortType.VIEWS ? "views" : "eventDate").descending());
         Page<Event> res = repository.findAll(spec, pageable);
+
+        //обновление просмотров
+        if (!res.isEmpty()) {
+            List<String> uris = res.stream().map(e -> Constants.getEventUri(e.getId())).toList();
+            LocalDateTime firstCreateOn = res.stream().map(Event::getCreatedOn).min(LocalDateTime::compareTo)
+                    .orElse(LocalDateTime.now());
+            List<StatsResponseDto> stats = client.getStats(firstCreateOn, LocalDateTime.now(), uris, true);
+            Map<String, Long> viewsMap = stats.stream()
+                    .collect(Collectors.toMap(StatsResponseDto::getUri, StatsResponseDto::getHits));
+
+            res.forEach(event -> {
+                String uri = Constants.getEventUri(event.getId());
+                event.setViews(viewsMap.getOrDefault(uri, 0L));
+            });
+        }
+
         return res.stream().map(mapper::mapEventToShortDto).toList();
     }
 
@@ -77,10 +101,13 @@ public class EventPublicServiceImpl implements EventPublicService {
 
         client.hit(Constants.APP, Constants.getEventUri(id), ip);
 
-        List<StatsResponseDto> stats = client.getStats(LocalDateTime.of(2000, 1, 1, 0, 0), LocalDateTime.now(), List.of(Constants.getEventUri(id)), true);
+        List<StatsResponseDto> stats = client.getStats(event.getCreatedOn(), LocalDateTime.now(),
+                List.of(Constants.getEventUri(id)), true);
 
         if (!stats.isEmpty()) {
             event.setViews(stats.getFirst().getHits());
+            //кеширование просмотров
+            repository.save(event);
         }
 
         return mapper.mapEventToFullDto(event);
