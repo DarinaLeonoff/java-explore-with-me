@@ -155,14 +155,11 @@ public class EventServiceImpl implements EventService {
 
         client.hit(Constants.APP, Constants.getEventUri(id), ip);
 
-        try { //время чтобы сервис статистики успел обработать запрос добавления статистики
-            Thread.sleep(50);
-        } catch (InterruptedException ignored) {
-        }
-
         List<StatsResponseDto> stats = client.getStats(event.getCreatedOn(), LocalDateTime.now(),
                 List.of(Constants.getEventUri(id)), true);
 
+        //предполагаю что просмотр уникальный, потом актуализирую
+        event.setViews(event.getViews() + 1);
         if (!stats.isEmpty()) {
             event.setViews(stats.getFirst().getHits());
             //кеширование просмотров

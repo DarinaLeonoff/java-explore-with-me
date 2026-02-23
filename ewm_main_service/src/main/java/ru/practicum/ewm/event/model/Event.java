@@ -66,12 +66,9 @@ public class Event {
     @Column(name = "state", length = 50)
     private EventState state;
 
-    @AttributeOverrides({
-            @AttributeOverride(name = "lat", column = @Column(name = "location_lat", nullable = false)),
-            @AttributeOverride(name = "lon", column = @Column(name = "location_lon", nullable = false))
-            })
+    @AttributeOverrides({@AttributeOverride(name = "lat", column = @Column(name = "location_lat", nullable = false)), @AttributeOverride(name = "lon", column = @Column(name = "location_lon", nullable = false))})
     private Location location;
 
     @Column(name = "views")
-    private Long views;
+    private Long views = 0L;
 }
