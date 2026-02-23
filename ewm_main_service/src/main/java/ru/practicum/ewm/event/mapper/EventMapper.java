@@ -1,16 +1,13 @@
 package ru.practicum.ewm.event.mapper;
 
-import org.mapstruct.*;
-import ru.practicum.ewm.category.dto.CategoryDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
-import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.updateDto.UpdateEventRequest;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
-import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.mapper.UserMapper;
 
 
@@ -21,5 +18,9 @@ public interface EventMapper {
 
     EventFullDto mapEventToFullDto(Event event);
 
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "state", expression = "java(EventState.PENDING)")
+    @Mapping(target = "views", expression = "java(0L)")
+    @Mapping(target = "createdOn", expression = "java(LocalDateTime.now())")
     Event mapNewEventToEvent(NewEventDto eventDto);
 }

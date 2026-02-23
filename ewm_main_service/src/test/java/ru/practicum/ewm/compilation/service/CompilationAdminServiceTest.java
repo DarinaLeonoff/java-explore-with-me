@@ -98,20 +98,20 @@ public class CompilationAdminServiceTest {
         long id = 1L;
 
         UpdateCompilationDto dto = new UpdateCompilationDto();
+        dto.setTitle("new");
 
         Compilation oldComp = new Compilation();
-        Compilation updated = new Compilation();
         Compilation saved = new Compilation();
         CompilationDto result = new CompilationDto();
 
         when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
-        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
-        when(compilationRepository.save(updated)).thenReturn(saved);
+        when(compilationRepository.save(oldComp)).thenReturn(saved);
         when(mapper.mapEntityToDto(saved)).thenReturn(result);
 
         CompilationDto response = service.adminUpdateCompilation(id, dto);
 
         assertEquals(result, response);
+        assertEquals("new", oldComp.getTitle());
     }
 
     @Test
@@ -122,18 +122,15 @@ public class CompilationAdminServiceTest {
         dto.setEvents(null);
 
         Compilation oldComp = new Compilation();
-        Compilation updated = new Compilation();
         Compilation saved = new Compilation();
-        CompilationDto result = new CompilationDto();
 
         when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
-        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
-        when(compilationRepository.save(updated)).thenReturn(saved);
-        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+        when(compilationRepository.save(oldComp)).thenReturn(saved);
+        when(mapper.mapEntityToDto(saved)).thenReturn(new CompilationDto());
 
-        CompilationDto response = service.adminUpdateCompilation(id, dto);
+        service.adminUpdateCompilation(id, dto);
 
-        assertEquals(result, response);
+        verify(eventRepository, never()).findAllById(any());
     }
 
     @Test
@@ -144,18 +141,16 @@ public class CompilationAdminServiceTest {
         dto.setEvents(List.of());
 
         Compilation oldComp = new Compilation();
-        Compilation updated = new Compilation();
-        Compilation saved = new Compilation();
-        CompilationDto result = new CompilationDto();
+
 
         when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
-        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
-        when(compilationRepository.save(updated)).thenReturn(saved);
-        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+        when(compilationRepository.save(oldComp)).thenReturn(new Compilation());
+        when(mapper.mapEntityToDto(any())).thenReturn(new CompilationDto());
 
-        CompilationDto response = service.adminUpdateCompilation(id, dto);
+        service.adminUpdateCompilation(id, dto);
 
-        assertEquals(result, response);
+
+        verify(eventRepository, never()).findAllById(any());
     }
 
     @Test
@@ -166,18 +161,15 @@ public class CompilationAdminServiceTest {
         dto.setEvents(List.of(1L, 2L));
 
         Compilation oldComp = new Compilation();
-        Compilation updated = new Compilation();
-        Compilation saved = new Compilation();
-        CompilationDto result = new CompilationDto();
 
         when(compilationRepository.findById(id)).thenReturn(Optional.of(oldComp));
-        when(mapper.updateCompilation(oldComp, dto)).thenReturn(updated);
-        when(compilationRepository.save(updated)).thenReturn(saved);
-        when(mapper.mapEntityToDto(saved)).thenReturn(result);
+        when(eventRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(new Event(), new Event()));
+        when(compilationRepository.save(oldComp)).thenReturn(new Compilation());
+        when(mapper.mapEntityToDto(any())).thenReturn(new CompilationDto());
 
-        CompilationDto response = service.adminUpdateCompilation(id, dto);
+        service.adminUpdateCompilation(id, dto);
 
-        assertEquals(result, response);
+        verify(eventRepository).findAllById(List.of(1L, 2L));
     }
 
 

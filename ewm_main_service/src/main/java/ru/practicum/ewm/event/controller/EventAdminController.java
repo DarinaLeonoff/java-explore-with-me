@@ -16,6 +16,7 @@ public class EventAdminController {
     @Autowired
     private EventService service;
 
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<EventFullDto> getEventsForAdmin(@RequestParam(required = false) List<Long> users,

@@ -17,14 +17,12 @@ public class RequestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     ParticipationRequestDto makeNewRequest(@PathVariable long userId, @RequestParam(required = true) long eventId) {
-
         return service.makeRequest(userId, eventId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<ParticipationRequestDto> getRequest(@PathVariable long userId) {
-
         return service.getUserRequests(userId);
     }
 

@@ -10,6 +10,7 @@ import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private Category getCategory(Integer id) {
-        return getCategory(id);
+        return repository.findById(id).orElseThrow(() -> new CategoryNotFound(id));
     }
 
     private Category updateCategory(CategoryDto changes, Category category) {

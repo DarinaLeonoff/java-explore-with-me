@@ -4,21 +4,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.updateDto.UpdateEventRequest;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.model.Location;
-import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class EventMapperTest {
@@ -97,103 +95,6 @@ public class EventMapperTest {
         assertEquals(event1.getParticipantLimit(), dto.getParticipantLimit());
         assertEquals(event1.isRequestModeration(), dto.isRequestModeration());
         assertEquals(event1.getTitle(), dto.getTitle());
-    }
-
-    @Test
-    void shouldUpdateAllFields() {
-
-        Event event = baseEvent();
-
-        UpdateEventRequest req = new UpdateEventRequest();
-        req.setAnnotation("new annotation");
-        req.setDescription("new description");
-        req.setTitle("new title");
-        req.setPaid(true);
-        req.setParticipantLimit(100);
-        req.setRequestModeration(true);
-        req.setEventDate(LocalDateTime.now());
-        req.setLocation(new Location(50.0, 60.0));
-
-        Category newCategory = new Category();
-        newCategory.setId(2);
-
-        mapper.updateEvent(event, req, newCategory);
-
-        assertEquals("new annotation", event.getAnnotation());
-        assertEquals("new description", event.getDescription());
-        assertEquals("new title", event.getTitle());
-        assertTrue(event.getPaid());
-        assertEquals(100, event.getParticipantLimit());
-        assertTrue(event.isRequestModeration());
-        assertEquals(2, event.getCategory().getId());
-        assertEquals(50.0, event.getLocation().getLat());
-    }
-
-    @Test
-    void shouldNotOverrideWithNulls() {
-
-        Event event = baseEvent();
-
-        UpdateEventRequest req = new UpdateEventRequest(); // все null
-
-        mapper.updateEvent(event, req, null);
-
-        assertEquals("old annotation", event.getAnnotation());
-        assertEquals("old description", event.getDescription());
-        assertEquals("old title", event.getTitle());
-        assertFalse(event.getPaid());
-        assertEquals(10, event.getParticipantLimit());
-        assertFalse(event.isRequestModeration());
-    }
-
-    @Test
-    void shouldUpdateOnlyAnnotation() {
-
-        Event event = baseEvent();
-
-        UpdateEventRequest req = new UpdateEventRequest();
-        req.setAnnotation("updated");
-
-        mapper.updateEvent(event, req, null);
-
-        assertEquals("updated", event.getAnnotation());
-        assertEquals("old title", event.getTitle());
-    }
-
-    @Test
-    void shouldUpdateCategory() {
-
-        Event event = baseEvent();
-
-        Category newCategory = new Category();
-        newCategory.setId(99);
-
-        mapper.updateEvent(event, new UpdateEventRequest(), newCategory);
-
-        assertEquals(99, event.getCategory().getId());
-    }
-
-    @Test
-    void shouldUpdateLocation() {
-
-        Event event = baseEvent();
-
-        UpdateEventRequest req = new UpdateEventRequest();
-        req.setLocation(new Location(1.0, 2.0));
-
-        mapper.updateEvent(event, req, null);
-
-        assertEquals(1.0, event.getLocation().getLat());
-    }
-
-    @Test
-    void shouldReturnSameEventIfUpdatesNull() {
-
-        Event event = baseEvent();
-
-        Event result = mapper.updateEvent(event, null, null);
-
-        assertSame(event, result);
     }
 
     private Event baseEvent() {

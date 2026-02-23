@@ -33,7 +33,6 @@ import ru.practicum.stats.client.StatsClient;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -81,11 +80,11 @@ public class EventServiceImpl implements EventService {
         Category cat = getCategory(dto.getCategory());
         User user = getUser(userId);
 
-        Event event = repository.save(mapper.mapNewEventToEvent(dto));
+        Event event = mapper.mapNewEventToEvent(dto);
         event.setCategory(cat);
         event.setInitiator(user);
 
-        return mapper.mapEventToFullDto(event);
+        return mapper.mapEventToFullDto(repository.save(event));
     }
 
     @Override
@@ -152,9 +151,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getPublicEvent(long id, String ip) {
-        Event event = getEvent(id);
+        Event event = repository.findByIdAndState(id, EventState.PUBLISHED).orElseThrow(() -> new EventNotFound(id));
 
         client.hit(Constants.APP, Constants.getEventUri(id), ip);
+
+        try { //время чтобы сервис статистики успел обработать запрос добавления статистики
+            Thread.sleep(50);
+        } catch (InterruptedException ignored) {
+        }
 
         List<StatsResponseDto> stats = client.getStats(event.getCreatedOn(), LocalDateTime.now(),
                 List.of(Constants.getEventUri(id)), true);

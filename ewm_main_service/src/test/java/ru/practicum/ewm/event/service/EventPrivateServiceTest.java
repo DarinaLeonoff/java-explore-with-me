@@ -125,22 +125,23 @@ public class EventPrivateServiceTest {
         Category category = new Category();
 
         Event event = new Event();
-        Event updated = new Event();
-        Event saved = new Event();
+        event.setState(EventState.PENDING);
+
         EventFullDto dto = new EventFullDto();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(repository.findByIdAndInitiatorId(eventId, userId)).thenReturn(event);
         when(categoryRepository.findById(5)).thenReturn(Optional.of(category));
-        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
-        when(repository.save(updated)).thenReturn(saved);
-        when(mapper.mapEventToFullDto(saved)).thenReturn(dto);
+        when(repository.save(event)).thenReturn(event);
+        when(mapper.mapEventToFullDto(event)).thenReturn(dto);
 
         EventFullDto result = service.userUpdateUserEvent(userId, eventId, request);
 
         assertEquals(dto, result);
+        assertEquals(category, event.getCategory());
 
         verify(categoryRepository).findById(5);
+        verify(repository).save(event);
     }
 
     @Test
@@ -148,17 +149,16 @@ public class EventPrivateServiceTest {
         UpdateEventUserRequest request = new UpdateEventUserRequest();
         request.setStateAction(StateUserAction.CANCEL_REVIEW);
 
-        Event updated = new Event();
+        Event event = new Event();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
-        when(repository.findByIdAndInitiatorId(2L, 1L)).thenReturn(new Event());
-        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
-        when(repository.save(updated)).thenReturn(updated);
-        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
+        when(repository.findByIdAndInitiatorId(2L, 1L)).thenReturn(event);
+        when(repository.save(event)).thenReturn(event);
+        when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
         service.userUpdateUserEvent(1L, 2L, request);
 
-        assertEquals(EventState.CANCELED, updated.getState());
+        assertEquals(EventState.CANCELED, event.getState());
     }
 
 

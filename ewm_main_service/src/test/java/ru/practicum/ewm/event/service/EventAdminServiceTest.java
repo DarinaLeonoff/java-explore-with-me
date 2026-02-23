@@ -80,39 +80,35 @@ public class EventAdminServiceTest {
 
     @Test
     void shouldUpdateEvent() {
-        Long id = 1L;
-
         UpdateEventAdminRequest request = new UpdateEventAdminRequest();
         request.setCategory(5);
 
         Event event = new Event();
+        event.setState(EventState.PENDING);
         Category category = new Category();
-        Event updated = new Event();
-        EventFullDto dto = new EventFullDto();
 
-        when(repository.findById(id)).thenReturn(Optional.of(event));
+        when(repository.findById(1L)).thenReturn(Optional.of(event));
         when(categoryRepository.findById(5)).thenReturn(Optional.of(category));
-        when(mapper.updateEvent(event, request, category)).thenReturn(updated);
-        when(mapper.mapEventToFullDto(updated)).thenReturn(dto);
+        when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
 
-        EventFullDto result = service.adminUpdateEvent(id, request);
+        EventFullDto result = service.adminUpdateEvent(1L, request);
 
-        assertEquals(dto, result);
+        assertEquals(category, event.getCategory());
+        verify(repository).save(event);
     }
 
     @Test
     void shouldUpdateWithoutCategory() {
-        Long id = 1L;
-
         UpdateEventAdminRequest request = new UpdateEventAdminRequest();
+        Event event = new Event();
+        event.setState(EventState.PENDING);
 
-        when(repository.findById(id)).thenReturn(Optional.of(new Event()));
-        when(mapper.updateEvent(any(), eq(request), isNull())).thenReturn(new Event());
+        when(repository.findById(1L)).thenReturn(Optional.of(event));
         when(mapper.mapEventToFullDto(any())).thenReturn(new EventFullDto());
 
-        service.adminUpdateEvent(id, request);
+        service.adminUpdateEvent(1L, request);
 
-        verify(categoryRepository, never()).findById(anyInt());
+        verify(categoryRepository, never()).findById(any());
     }
 
     @Test
@@ -120,15 +116,16 @@ public class EventAdminServiceTest {
         UpdateEventAdminRequest request = new UpdateEventAdminRequest();
         request.setStateAction(StateAdminAction.PUBLISH_EVENT);
 
-        Event updated = new Event();
+        Event event = new Event();
+        event.setState(EventState.PENDING);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
-        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
-        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
+        when(repository.findById(1L)).thenReturn(Optional.of(event));
+        when(mapper.mapEventToFullDto(any())).thenReturn(new EventFullDto());
 
         service.adminUpdateEvent(1L, request);
 
-        assertEquals(EventState.PUBLISHED, updated.getState());
+        assertEquals(EventState.PUBLISHED, event.getState());
+        verify(repository).save(event);
     }
 
     @Test
@@ -136,15 +133,16 @@ public class EventAdminServiceTest {
         UpdateEventAdminRequest request = new UpdateEventAdminRequest();
         request.setStateAction(StateAdminAction.REJECT_EVENT);
 
-        Event updated = new Event();
+        Event event = new Event();
+        event.setState(EventState.PENDING);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(new Event()));
-        when(mapper.updateEvent(any(), eq(request), any())).thenReturn(updated);
-        when(mapper.mapEventToFullDto(updated)).thenReturn(new EventFullDto());
+        when(repository.findById(1L)).thenReturn(Optional.of(event));
+        when(mapper.mapEventToFullDto(any())).thenReturn(new EventFullDto());
 
         service.adminUpdateEvent(1L, request);
 
-        assertEquals(EventState.CANCELED, updated.getState());
+        assertEquals(EventState.CANCELED, event.getState());
+        verify(repository).save(event);
     }
 
     @Test

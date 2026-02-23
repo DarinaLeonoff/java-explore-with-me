@@ -14,7 +14,8 @@ import ru.practicum.ewm.exception.notFound.CategoryNotFound;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,22 +50,19 @@ public class CategoryAdminServiceTest {
 
     @Test
     void updateCategoryTest() {
-        CategoryDto dto = CategoryDto.builder().name("update Cat").build();
         Category category = Category.builder().id(1).name("cat").build();
-        category.setName(dto.getName());
-        when(repository.findById(1)).thenReturn(Optional.ofNullable(category));
 
-        category.setName(dto.getName());
-        when(mapper.updateCategory(dto, category)).thenReturn(category);
+        CategoryDto dto = CategoryDto.builder().id(1).name("update Cat").build();
+
+        when(repository.findById(1)).thenReturn(Optional.of(category));
         when(repository.save(category)).thenReturn(category);
-        dto.setId(category.getId());
         when(mapper.mapCategoryToDto(category)).thenReturn(dto);
 
         CategoryDto updated = service.adminUpdateCategory(dto, 1);
 
         assertEquals("update Cat", updated.getName());
-        assertEquals(1, updated.getId());
     }
+
 
     @Test
     void updateCategoryFallTest() {

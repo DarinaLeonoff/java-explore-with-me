@@ -87,7 +87,7 @@ public class EventPublicServiceTest {
     }
 
     @Test
-    void shouldReturnEvent() throws InterruptedException {
+    void shouldReturnEvent() {
 
         Event event = new Event();
         event.setId(1L);
@@ -132,22 +132,6 @@ public class EventPublicServiceTest {
         service.getPublicEvent(1L, "ip");
 
         assertEquals(10L, event.getViews());
-    }
-
-    @Test
-    void shouldRetryFindEvent() throws InterruptedException {
-
-        Event event = new Event();
-
-        when(repository.findByIdAndState(anyLong(), any())).thenReturn(Optional.empty()).thenReturn(Optional.of(event));
-
-        when(client.getStats(any(), any(), any(), anyBoolean())).thenReturn(List.of());
-
-        when(mapper.mapEventToFullDto(event)).thenReturn(new EventFullDto());
-
-        service.getPublicEvent(1L, "ip");
-
-        verify(repository, atLeast(2)).findByIdAndState(1L, EventState.PUBLISHED);
     }
 
     @Test
