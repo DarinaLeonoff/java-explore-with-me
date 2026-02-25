@@ -6,18 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.dto.StatsRequestDto;
 import ru.practicum.dto.StatsResponseDto;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,18 +69,23 @@ public class StatsClientTest {
     @Test
     void getStats_shouldCallGetForObjectAndReturnResponse() {
         // given
-        Map<String, String> params = Map.of("app", "ewm-main-server", "uri", "/stats");
+        LocalDateTime start = LocalDateTime.now().minusYears(1);
+        LocalDateTime end = LocalDateTime.now();
+        List<String> uris = List.of("/events/2", "/events/1", "/events/3");
+        boolean unique = false;
 
-        StatsResponseDto responseDto = StatsResponseDto.builder().app("ewm-main-server").uri("/stats").hits(1).build();
+        List<StatsResponseDto> responseList = List.of(StatsResponseDto.builder().app("ewm-main-server").uri("/events/1").hits(10L).build());
 
-        when(restTemplate.getForObject(eq(statsServiceUrl + "/stats"), eq(StatsResponseDto.class), eq(params))).thenReturn(responseDto);
+        ResponseEntity<List<StatsResponseDto>> responseEntity = new ResponseEntity<>(responseList, HttpStatus.OK);
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
 
         // when
-        StatsResponseDto result = statsClient.getStats(params);
+        List<StatsResponseDto> result = statsClient.getStats(start, end, uris, unique);
 
         // then
-        assertThat(result).isEqualTo(responseDto);
+        assertThat(result).isEqualTo(responseList);
 
-        verify(restTemplate).getForObject(statsServiceUrl + "/stats", StatsResponseDto.class, params);
+        verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class));
     }
 }

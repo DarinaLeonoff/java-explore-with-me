@@ -39,7 +39,10 @@ public class StatControllerTest {
     void hitShouldReturnOk() throws Exception {
         StatsRequestDto dto = StatsRequestDto.builder().app("app").uri("/hit").ip("127.0.0.1").timestamp(LocalDateTime.now()).build();
 
-        mockMvc.perform(post("/hit").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated());
+        mockMvc.perform(post("/hit")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated());
 
         verify(service, times(1)).hit(any(StatsRequestDto.class));
     }
@@ -65,7 +68,7 @@ public class StatControllerTest {
     //    get tests
     @Test
     void getStats_withAllParams() throws Exception {
-        List<StatsResponseDto> response = List.of(new StatsResponseDto("app", "/hit", 2));
+        List<StatsResponseDto> response = List.of(new StatsResponseDto("app", "/hit", 2L));
 
         when(service.getStats(any(), any(), any(), any())).thenReturn(response);
 

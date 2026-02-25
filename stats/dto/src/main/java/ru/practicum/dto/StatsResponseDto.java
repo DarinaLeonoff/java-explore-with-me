@@ -16,11 +16,5 @@ public class StatsResponseDto {
     private String app, uri;
 
     @PositiveOrZero
-    private int hits;
-
-    public StatsResponseDto(String app, String uri, long hits) {
-        this.app = app;
-        this.uri = uri;
-        this.hits = (int) hits;
-    }
+    private Long hits;
 }
