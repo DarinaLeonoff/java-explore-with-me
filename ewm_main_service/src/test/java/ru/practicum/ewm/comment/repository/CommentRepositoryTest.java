@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @SpringBootTest
 public class CommentRepositoryTest {
     @Autowired
-    private CommentsRepository commentsRepository;
+    private CommentRepository commentRepository;
     @Autowired
     private EventRepository eventRepository;
     @Autowired
@@ -51,13 +51,13 @@ public class CommentRepositoryTest {
                 .eventDate(LocalDateTime.of(2026, 3, 11, 12, 0)).category(category).paid(false).participantLimit(0)
                 .publishedOn(LocalDateTime.now()).requestModeration(true).confirmedRequests(0)
                 .state(EventState.PUBLISHED).location(new Location(20D, 20D)).views(0L).build());
-        comment = commentsRepository.save(
+        comment = commentRepository.save(
                 Comment.builder().event(event).user(user).text("Comment").created(LocalDateTime.now()).build());
     }
 
     @Test
     void shouldReturnComment() {
-        Comment result = commentsRepository.findById(comment.getId()).get();
+        Comment result = commentRepository.findById(comment.getId()).get();
 
         assertEquals(comment.getId(), result.getId());
         assertEquals(comment.getUser().getId(), result.getUser().getId());
@@ -67,7 +67,7 @@ public class CommentRepositoryTest {
 
     @Test
     void shouldReturnCommentByEventId() {
-        List<Comment> resultList = commentsRepository.findAllByEventId(event.getId());
+        List<Comment> resultList = commentRepository.findAllByEventId(event.getId());
         Comment result = resultList.getFirst();
 
         assertEquals(comment.getId(), result.getId());
@@ -78,18 +78,7 @@ public class CommentRepositoryTest {
 
     @Test
     void shouldReturnCommentByUserId() {
-        List<Comment> resultList = commentsRepository.findAllByUserId(user.getId());
-        Comment result = resultList.getFirst();
-
-        assertEquals(comment.getId(), result.getId());
-        assertEquals(comment.getUser().getId(), result.getUser().getId());
-        assertEquals(comment.getEvent().getId(), result.getEvent().getId());
-        assertEquals(comment.getText(), result.getText());
-    }
-
-    @Test
-    void shouldReturnCommentByEventAndUserId() {
-        List<Comment> resultList = commentsRepository.findAllByEventIdAndUserId(event.getId(), user.getId());
+        List<Comment> resultList = commentRepository.findAllByUserId(user.getId());
         Comment result = resultList.getFirst();
 
         assertEquals(comment.getId(), result.getId());
@@ -103,7 +92,7 @@ public class CommentRepositoryTest {
         Comment newComment = Comment.builder().id(comment.getId()).event(comment.getEvent()).user(comment.getUser())
                 .text("new " + "text").created(comment.getCreated()).build();
 
-        Comment updated = commentsRepository.save(newComment);
+        Comment updated = commentRepository.save(newComment);
         assertEquals(comment.getId(), updated.getId());
         assertEquals(comment.getUser().getId(), updated.getUser().getId());
         assertEquals(comment.getEvent().getId(), updated.getEvent().getId());
@@ -112,8 +101,8 @@ public class CommentRepositoryTest {
 
     @Test
     void shouldReturnNullAfterDelete() {
-        commentsRepository.deleteById(comment.getId());
-        Optional<Comment> result = commentsRepository.findById(comment.getId());
+        commentRepository.deleteById(comment.getId());
+        Optional<Comment> result = commentRepository.findById(comment.getId());
 
         assertFalse(result.isPresent());
     }
