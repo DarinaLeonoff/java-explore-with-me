@@ -79,6 +79,6 @@ CREATE TABLE IF NOT EXISTS comments(
     text VARCHAR(5000) NOT NULL,
     created TIMESTAMP NOT NULL,
     edited TIMESTAMP,
-    CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    CONSTRAINT fk_event_comment FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_comment FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );;
