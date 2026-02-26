@@ -17,8 +17,10 @@ import ru.practicum.ewm.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 public class CommentRepositoryTest {
@@ -35,11 +37,14 @@ public class CommentRepositoryTest {
     private Event event;
     private User user;
     private Category category;
+    private Random random = new Random();
 
     @BeforeEach
     void setup() {
-        user = userRepository.save(User.builder().name("Adam").email("email@yandex.ru").build());
-        category = categoryRepository.save(Category.builder().name("Graduating").build());
+        user = userRepository.save(
+                User.builder().name("Adam").email(random.nextInt() + "email" + random.nextInt() + "@yandex.ru")
+                        .build());
+        category = categoryRepository.save(Category.builder().name("Category #" + random.nextInt()).build());
         event = eventRepository.save(Event.builder().createdOn(LocalDateTime.now()).initiator(user).title("Graduation")
                 .annotation("Finish of Java course")
                 .description("The day when we get certificates, finish studying and start work-life routine")
@@ -63,6 +68,28 @@ public class CommentRepositoryTest {
     @Test
     void shouldReturnCommentByEventId() {
         List<Comment> resultList = commentsRepository.findAllByEventId(event.getId());
+        Comment result = resultList.getFirst();
+
+        assertEquals(comment.getId(), result.getId());
+        assertEquals(comment.getUser().getId(), result.getUser().getId());
+        assertEquals(comment.getEvent().getId(), result.getEvent().getId());
+        assertEquals(comment.getText(), result.getText());
+    }
+
+    @Test
+    void shouldReturnCommentByUserId() {
+        List<Comment> resultList = commentsRepository.findAllByUserId(user.getId());
+        Comment result = resultList.getFirst();
+
+        assertEquals(comment.getId(), result.getId());
+        assertEquals(comment.getUser().getId(), result.getUser().getId());
+        assertEquals(comment.getEvent().getId(), result.getEvent().getId());
+        assertEquals(comment.getText(), result.getText());
+    }
+
+    @Test
+    void shouldReturnCommentByEventAndUserId() {
+        List<Comment> resultList = commentsRepository.findAllByEventIdAndUserId(event.getId(), user.getId());
         Comment result = resultList.getFirst();
 
         assertEquals(comment.getId(), result.getId());
