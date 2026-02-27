@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event.controller;
+package ru.practicum.ewm.comment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.NewCommentDto;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.updateDto.StateAdminAction;
@@ -28,16 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class EventAdminControllerIT {
+public class PublicCommentControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private UserDto user;
-    private EventFullDto event;
-    private CategoryDto category;
+    private CommentDto comment;
+    private String uri;
 
     @BeforeEach
     void setup() throws Exception {
@@ -46,7 +47,7 @@ public class EventAdminControllerIT {
                         .content(objectMapper.writeValueAsString(new NewUserRequestDto("User", "user@mail.com")))).andReturn()
                 .getResponse().getContentAsString();
 
-        user = objectMapper.readValue(userResponse, UserDto.class);
+        UserDto user = objectMapper.readValue(userResponse, UserDto.class);
 
         // 3. создаём категорию
         NewCategoryDto categoryDto = new NewCategoryDto();
@@ -55,7 +56,7 @@ public class EventAdminControllerIT {
         String catResponse = mockMvc.perform(post("/admin/categories").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(categoryDto))).andReturn().getResponse().getContentAsString();
 
-        category = objectMapper.readValue(catResponse, CategoryDto.class);
+        CategoryDto category = objectMapper.readValue(catResponse, CategoryDto.class);
 
         // 3. создаём событие
         NewEventDto newEventDto = NewEventDto.builder().annotation("Annotation Annotation Annotation Annotation")
@@ -67,69 +68,51 @@ public class EventAdminControllerIT {
                                 .content(objectMapper.writeValueAsString(newEventDto))).andReturn().getResponse()
                 .getContentAsString();
 
-        event = objectMapper.readValue(eventResponse, EventFullDto.class);
+        EventFullDto event = objectMapper.readValue(eventResponse, EventFullDto.class);
 
-    }
-
-    // ================= GET =================
-
-    @Test
-    void shouldReturnEvents() throws Exception {
-        mockMvc.perform(get("/admin/events")).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
-    }
-
-    @Test
-    void shouldFilterByUser() throws Exception {
-        mockMvc.perform(get("/admin/events").param("users", user.getId().toString())).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].initiator.id").value(user.getId()));
-    }
-
-    @Test
-    void shouldFilterByState() throws Exception {
-        mockMvc.perform(get("/admin/events").param("states", "PENDING")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].state").value("PENDING"));
-    }
-
-    @Test
-    void shouldReturnEmptyWhenNoMatch() throws Exception {
-        mockMvc.perform(get("/admin/events").param("states", "PUBLISHED")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
-    }
-
-    // ================= PATCH =================
-
-    @Test
-    void shouldPublishEvent() throws Exception {
-        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-        request.setStateAction(StateAdminAction.PUBLISH_EVENT);
+        // 4. публикуем событие
+        UpdateEventAdminRequest publishRequest = new UpdateEventAdminRequest();
+        publishRequest.setStateAction(StateAdminAction.PUBLISH_EVENT);
 
         mockMvc.perform(patch("/admin/events/" + event.getId()).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("PUBLISHED"));
+                .content(objectMapper.writeValueAsString(publishRequest))).andExpect(status().isOk());
+
+        String baseUri = "/users/" + user.getId() + "/events/" + event.getId() + "/comments";
+
+        //5. создаем комментарий
+        NewCommentDto dto = NewCommentDto.builder().text("comment").build();
+        String commentResponse = mockMvc.perform(
+                        post(baseUri).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto)))
+                .andReturn().getResponse().getContentAsString();
+        comment = objectMapper.readValue(commentResponse, CommentDto.class);
+
+        uri = "/events/" + event.getId() + "/comments";
     }
 
     @Test
-    void shouldRejectEvent() throws Exception {
-        UpdateEventAdminRequest request = new UpdateEventAdminRequest();
-        request.setStateAction(StateAdminAction.REJECT_EVENT);
-
-        mockMvc.perform(patch("/admin/events/" + event.getId()).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("CANCELED"));
+    void shouldReturnEventComments() throws Exception {
+        mockMvc.perform(get(uri)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(comment.getId()))
+                .andExpect(jsonPath("$[0].text").value("comment"));
     }
 
     @Test
-    void shouldReturnConflictWhenPublishingNotPending() throws Exception {
-        // сначала публикуем
-        UpdateEventAdminRequest publish = new UpdateEventAdminRequest();
-        publish.setStateAction(StateAdminAction.PUBLISH_EVENT);
-
-        mockMvc.perform(patch("/admin/events/" + event.getId()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(publish)));
-
-        // повторная публикация
-        mockMvc.perform(patch("/admin/events/" + event.getId()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(publish))).andExpect(status().isConflict());
+    void shouldReturnUserComments() throws Exception {
+        mockMvc.perform(get(uri + "/users/" + comment.getUser().getId())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].id").value(comment.getId()));
     }
 
+    @Test
+    void shouldReturnCommentById() throws Exception {
+        mockMvc.perform(get(uri + "/" + comment.getId())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(comment.getId())).andExpect(jsonPath("$.text").value("comment"));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoComments() throws Exception {
+        // удалить комментарий
+        mockMvc.perform(delete("/admin/events/" + comment.getEvent().getId() + "/comments/" + comment.getId()));
+
+        mockMvc.perform(get(uri)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+    }
 }

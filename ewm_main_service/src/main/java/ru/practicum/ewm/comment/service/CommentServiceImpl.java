@@ -32,6 +32,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper mapper;
 
+    //private
     @Override
     public CommentDto saveComment(Long eventId, Long userId, NewCommentDto dto) {
         Event event = getEvent(eventId);
@@ -43,6 +44,7 @@ public class CommentServiceImpl implements CommentService {
         return mapper.mapCommentToDto(comment);
     }
 
+    //private
     @Override
     public CommentDto updateComment(Long eventId, Long userId, Long commentId, UpdateCommentDto dto) {
         Event event = getEvent(eventId);
@@ -59,12 +61,14 @@ public class CommentServiceImpl implements CommentService {
         return mapper.mapCommentToDto(updated);
     }
 
+    //public
     @Override
     public CommentDto getCommentById(Long commentId) {
         getComment(commentId);
         return mapper.mapCommentToDto(getComment(commentId));
     }
 
+    //public
     @Override
     public List<CommentDto> getAllCommentsByEventId(Long eventId) {
         Event event = getEvent(eventId);
@@ -72,6 +76,7 @@ public class CommentServiceImpl implements CommentService {
         return commentList.stream().map(mapper::mapCommentToDto).toList();
     }
 
+    //public
     @Override
     public List<CommentDto> getAllCommentsByUserId(Long userId) {
         User user = getUser(userId);
@@ -79,11 +84,13 @@ public class CommentServiceImpl implements CommentService {
         return commentList.stream().map(mapper::mapCommentToDto).toList();
     }
 
+    //admin
     @Override
     public void adminRemoveComment(Long commentId) {
         commentRepository.deleteById(commentId);
     }
 
+    //private
     @Override
     public void authorRemoveComment(Long commentId, Long userId) {
         User user = getUser(userId);
