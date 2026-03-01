@@ -1220,7 +1220,7 @@
         "exec": [
           "API = class {\r",
           "    constructor(postman, verbose = false) {\r",
-          "        this.baseUrl = this.baseUrl =\n    pm.environment.get(\"baseUrl\") ||\n    pm.collectionVariables.get(\"baseUrl\") ||\n    \"http://localhost:8080\";\r",
+          "        this.baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";\r",
           "        this.pm = postman;\r",
           "        this._verbose = verbose;\r",
           "    }\r",
@@ -1444,6 +1444,10 @@
     },
     {
       "key": "comment",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
       "value": ""
     }
   ]
